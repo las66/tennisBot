@@ -1,19 +1,30 @@
+package las.bot.tennis.service;
+
+import las.bot.tennis.config.BotConfig;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+@Component
 public class TennisBot extends TelegramLongPollingBot {
+
+    private final BotConfig botConfig;
+
+    public TennisBot(BotConfig botConfig) {
+        this.botConfig = botConfig;
+    }
 
     @Override
     public String getBotUsername() {
-        return MyProp.getProperty("BOT_USERNAME");
+        return botConfig.getUsername();
     }
 
     @Override
     public String getBotToken() {
-        return MyProp.getProperty("BOT_TOKEN");
+        return botConfig.getToken();
     }
 
     @Override
