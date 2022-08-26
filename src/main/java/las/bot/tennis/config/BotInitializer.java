@@ -1,6 +1,6 @@
 package las.bot.tennis.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -9,10 +9,10 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.LongPollingBot;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
+@Slf4j
 @Component
 public class BotInitializer {
 
-    @Autowired
     private final LongPollingBot bot;
 
     public BotInitializer(LongPollingBot bot) {
@@ -22,10 +22,12 @@ public class BotInitializer {
     @EventListener({ContextRefreshedEvent.class})
     public void init() {
         try {
+            log.info("Инициализация бота: Старт");
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
             botsApi.registerBot(bot);
+            log.info("Инициализация бота: Готово");
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            log.error("Ошибка при инициализации бота: " + e.getMessage());
         }
     }
 
