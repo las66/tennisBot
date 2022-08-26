@@ -18,6 +18,6 @@ public class User {
     @Id
     private Long chatId;
 
-    private Integer messageCount;
+    private int state;
 
 }

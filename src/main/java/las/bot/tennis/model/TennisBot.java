@@ -32,7 +32,7 @@ public class TennisBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        botUpdateHandler.handleUpdate(update);
+        botUpdateHandler.process(update);
     }
 
 }
