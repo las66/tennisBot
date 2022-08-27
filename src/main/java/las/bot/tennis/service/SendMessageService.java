@@ -1,5 +1,6 @@
 package las.bot.tennis.service;
 
+import las.bot.tennis.helper.KeyboardGenerator;
 import las.bot.tennis.model.TennisBot;
 import las.bot.tennis.model.User;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +29,7 @@ public class SendMessageService {
         User user = userService.getUser(userId);
         UserStateEnum userStateEnum = UserStateEnum.getById(user.getState());
         SendMessage sendMessage = new SendMessage(userId.toString(), userStateEnum.getMessage());
-        sendMessage.setReplyMarkup(keyboard == null ? userStateEnum.getKeyboard() : keyboard);
+        sendMessage.setReplyMarkup(keyboard == null ? KeyboardGenerator.getKeyboardByState(userStateEnum) : keyboard);
         sendMessage(sendMessage);
     }
 

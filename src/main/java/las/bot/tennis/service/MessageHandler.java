@@ -9,21 +9,25 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import java.util.List;
 
 import static las.bot.tennis.service.BotCommandsEnum.GO_TO_MAIN_MENU;
+import static las.bot.tennis.service.BotCommandsEnum.WRONG_COMMAND;
 import static las.bot.tennis.service.UserStateEnum.*;
 
 @Service
 public class MessageHandler {
 
     private final UserService userService;
+    private final GroupService groupService;
     private final SendMessageService sendMessageService;
 
-    public MessageHandler(UserService userService, SendMessageService sendMessageService) {
+    public MessageHandler(UserService userService, GroupService groupService, SendMessageService sendMessageService) {
         this.userService = userService;
+        this.groupService = groupService;
         this.sendMessageService = sendMessageService;
     }
 
     public void process(Message message) {
         BotCommandsEnum command = BotCommandsEnum.getByCommand(message.getText());
+
         if (command == GO_TO_MAIN_MENU) {
             userService.changeStateTo(message.getChatId(), MAIN_MENU);
             sendMessageService.sendStateMessage(message.getChatId());
@@ -45,17 +49,23 @@ public class MessageHandler {
                 }
                 sendMessageService.sendStateMessage(message.getChatId(), keyboard);
                 return;
+            case NEW_GROUP_STEP_1:
+                if (groupService.getGroup(message.getText()) != null) {
+                    userService.changeStateTo(message.getChatId(), GROUP_ALREADY_EXISTS);
+                } else {
+                    groupService.createGroup(message);
+                    userService.changeStateTo(message.getChatId(), MAIN_MENU);
+                }
+                sendMessageService.sendStateMessage(message.getChatId());
+                return;
         }
 
-
-        switch (command) {
-            case WORK_WITH_CLIENTS:
-                userService.changeStateTo(message.getChatId(), CLIENTS_WORK_MENU);
-                break;
-            case GET_CLIENT:
-                userService.changeStateTo(message.getChatId(), GET_CLIENT_STEP_1);
-                break;
+        if (command == WRONG_COMMAND) {
+            sendMessageService.sendMessage(message.getChatId(), WRONG_COMMAND.getCommand());
+        } else {
+            userService.changeStateTo(message.getChatId(), command.getNextState());
         }
+
         sendMessageService.sendStateMessage(message.getChatId());
     }
 
