@@ -10,20 +10,26 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 public class BotUpdateHandler {
 
     private final MessageHandler messageHandler;
+    private final CallbackQueryHandler callbackQueryHandler;
     private final UserService userService;
 
-    public BotUpdateHandler(MessageHandler messageHandler, UserService userService) {
+    public BotUpdateHandler(MessageHandler messageHandler, CallbackQueryHandler callbackQueryHandler, UserService userService) {
         this.messageHandler = messageHandler;
+        this.callbackQueryHandler = callbackQueryHandler;
         this.userService = userService;
     }
 
     public void process(Update update) {
         log.debug("Событие: " + update);
-
-        Message message = update.getMessage();
-        if (message != null) {
-            userService.createUserIfAbsent(message);
-            messageHandler.process(message);
+        if (update.hasCallbackQuery()) {
+            callbackQueryHandler.process(update.getCallbackQuery());
+        } else {
+            Message message = update.getMessage();
+            if (message != null) {
+                userService.createUserIfAbsent(message);
+                messageHandler.process(message);
+            }
         }
     }
+
 }
