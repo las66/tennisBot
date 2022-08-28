@@ -15,10 +15,12 @@ public class SendMessageService {
 
     private final UserService userService;
     private final TennisBot bot;
+    private final KeyboardGenerator keyboardGenerator;
 
-    public SendMessageService(UserService userService, TennisBot bot) {
+    public SendMessageService(UserService userService, TennisBot bot, KeyboardGenerator keyboardGenerator) {
         this.userService = userService;
         this.bot = bot;
+        this.keyboardGenerator = keyboardGenerator;
     }
 
     public void sendStateMessage(Long userId) {
@@ -29,7 +31,7 @@ public class SendMessageService {
         User user = userService.getUser(userId);
         UserStateEnum userStateEnum = UserStateEnum.getById(user.getState());
         SendMessage sendMessage = new SendMessage(userId.toString(), userStateEnum.getMessage());
-        sendMessage.setReplyMarkup(keyboard == null ? KeyboardGenerator.getKeyboardByState(userStateEnum) : keyboard);
+        sendMessage.setReplyMarkup(keyboard == null ? keyboardGenerator.getKeyboardByState(userStateEnum) : keyboard);
         sendMessage(sendMessage);
     }
 

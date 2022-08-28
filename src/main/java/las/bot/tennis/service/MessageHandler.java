@@ -1,6 +1,7 @@
 package las.bot.tennis.service;
 
 import las.bot.tennis.helper.KeyboardGenerator;
+import las.bot.tennis.model.Group;
 import las.bot.tennis.model.User;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -18,11 +19,16 @@ public class MessageHandler {
     private final UserService userService;
     private final GroupService groupService;
     private final SendMessageService sendMessageService;
+    private final KeyboardGenerator keyboardGenerator;
 
-    public MessageHandler(UserService userService, GroupService groupService, SendMessageService sendMessageService) {
+    public MessageHandler(UserService userService,
+                          GroupService groupService,
+                          SendMessageService sendMessageService,
+                          KeyboardGenerator keyboardGenerator) {
         this.userService = userService;
         this.groupService = groupService;
         this.sendMessageService = sendMessageService;
+        this.keyboardGenerator = keyboardGenerator;
     }
 
     public void process(Message message) {
@@ -34,8 +40,8 @@ public class MessageHandler {
             return;
         }
 
-        User user = userService.getUser(message.getChatId());
-        UserStateEnum state = getById(user.getState());
+        User currentUser = userService.getUser(message.getChatId());
+        UserStateEnum state = getById(currentUser.getState());
 
         switch (state) {
             case GET_CLIENT_STEP_1:
@@ -45,7 +51,7 @@ public class MessageHandler {
                     userService.changeStateTo(message.getChatId(), CLIENTS_NOT_FOUND);
                 } else {
                     userService.changeStateTo(message.getChatId(), GET_CLIENT_STEP_2);
-                    keyboard = KeyboardGenerator.inlineKeyboard(users);
+                    keyboard = keyboardGenerator.inlineUserKeyboard(users);
                 }
                 sendMessageService.sendStateMessage(message.getChatId(), keyboard);
                 return;
@@ -57,6 +63,22 @@ public class MessageHandler {
                     userService.changeStateTo(message.getChatId(), MAIN_MENU);
                 }
                 sendMessageService.sendStateMessage(message.getChatId());
+                return;
+            case ADD_CLIENT_TO_GROUP_STEP_1:
+                userService.changeStateTo(message.getChatId(), ADD_CLIENT_TO_GROUP_STEP_2);
+                List<Group> groups = groupService.getAll(message.getText());
+                sendMessageService.sendStateMessage(message.getChatId(), keyboardGenerator.inlineGroupKeyboard(groups));
+                return;
+            case ADD_CLIENT_TO_GROUP_STEP_2:
+                users = userService.findUsers(message.getText());
+                keyboard = null;
+                if (users.isEmpty()) {
+                    sendMessageService.sendMessage(message.getChatId(), CLIENTS_NOT_FOUND.getMessage());
+                } else {
+                    userService.changeStateTo(message.getChatId(), ADD_CLIENT_TO_GROUP_STEP_3, currentUser.getContext());
+                    keyboard = keyboardGenerator.inlineUserKeyboard(users);
+                }
+                sendMessageService.sendStateMessage(message.getChatId(), keyboard);
                 return;
         }
 

@@ -1,5 +1,6 @@
 package las.bot.tennis.service;
 
+import las.bot.tennis.model.Group;
 import las.bot.tennis.model.User;
 import las.bot.tennis.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -40,10 +41,15 @@ public class UserService {
         }
     }
 
-    public void changeStateTo(Long userId, UserStateEnum state) {
+    public void changeStateTo(Long userId, UserStateEnum state, String context) {
         User user = getUser(userId);
+        user.setContext(context);
         user.setState(state.getStateId());
         userRepository.save(user);
+    }
+
+    public void changeStateTo(Long userId, UserStateEnum state) {
+        changeStateTo(userId, state, null);
     }
 
     public List<User> findUsers(String text) {
@@ -56,6 +62,12 @@ public class UserService {
             }
         });
         return users;
+    }
+
+    public void addToGroup(String userId, Group group) {
+        User user = getUser(userId);
+        user.getGroups().add(group);
+        userRepository.save(user);
     }
 
 }

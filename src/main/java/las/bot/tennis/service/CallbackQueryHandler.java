@@ -8,32 +8,51 @@ import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import static las.bot.tennis.service.UserStateEnum.CLIENT_WORK_MENU;
+import static las.bot.tennis.service.UserStateEnum.*;
 
 @Slf4j
 @Service
 public class CallbackQueryHandler {
 
     private final UserService userService;
+    private final GroupService groupService;
     private final SendMessageService sendMessageService;
     private final TennisBot bot;
 
-    public CallbackQueryHandler(UserService userService, SendMessageService sendMessageService, TennisBot bot) {
+    public CallbackQueryHandler(UserService userService,
+                                GroupService groupService,
+                                SendMessageService sendMessageService,
+                                TennisBot bot) {
         this.userService = userService;
+        this.groupService = groupService;
         this.sendMessageService = sendMessageService;
         this.bot = bot;
     }
 
     public void process(CallbackQuery callbackQuery) {
-        Long chatId = callbackQuery.getMessage().getChatId();
-        User user = userService.getUser(chatId);
-        UserStateEnum state = UserStateEnum.getById(user.getState());
+        Long currentUserId = callbackQuery.getMessage().getChatId();
+        User currentUser = userService.getUser(currentUserId);
+        UserStateEnum state = UserStateEnum.getById(currentUser.getState());
         switch (state) {
             case GET_CLIENT_STEP_2:
-                userService.changeStateTo(chatId, CLIENT_WORK_MENU);
+                userService.changeStateTo(currentUserId, CLIENT_WORK_MENU);
                 String clientInfo = userService.getUser(callbackQuery.getData()).toShortString();
-                sendMessageService.sendMessage(chatId, clientInfo);
-                sendMessageService.sendStateMessage(chatId);
+                sendMessageService.sendMessage(currentUserId, clientInfo);
+                sendMessageService.sendStateMessage(currentUserId);
+                break;
+            case ADD_CLIENT_TO_GROUP_STEP_1:
+                userService.changeStateTo(currentUserId, ADD_CLIENT_TO_GROUP_STEP_2, callbackQuery.getData());
+                String groupInfo = groupService.getGroup(callbackQuery.getData()).toShortString();
+                sendMessageService.sendMessage(currentUserId, groupInfo);
+                sendMessageService.sendStateMessage(currentUserId);
+                break;
+            case ADD_CLIENT_TO_GROUP_STEP_3:
+                userService.changeStateTo(currentUserId, CLIENT_ADDED_TO_GROUP, currentUser.getContext());
+                userService.addToGroup(callbackQuery.getData(), groupService.getGroup(currentUser.getContext()));
+                User addedUser = userService.getUser(callbackQuery.getData());
+                sendMessageService.sendMessage(currentUserId, addedUser.getName() + " добавлен в группу " + currentUser.getContext());
+                sendMessageService.sendStateMessage(currentUserId);
+                break;
         }
 
         try {

@@ -1,7 +1,6 @@
 package las.bot.tennis.service;
 
 import lombok.Getter;
-import org.springframework.context.annotation.Lazy;
 
 import java.util.Arrays;
 
@@ -14,6 +13,7 @@ public enum BotCommandsEnum {
     WORK_WITH_GROUPS("Группы", GROUPS_WORK_MENU),
     GET_CLIENT("Найти клиента", GET_CLIENT_STEP_1),
     NEW_GROUP("Новая группа", NEW_GROUP_STEP_1),
+    ADD_CLIENT_TO_GROUP("Добавить клиента в группу", ADD_CLIENT_TO_GROUP_STEP_1),
 
     WRONG_COMMAND("Неизвестная команда \uD83E\uDD14", null);
 

@@ -1,9 +1,13 @@
 package las.bot.tennis.service;
 
+import com.google.common.collect.Lists;
 import las.bot.tennis.model.Group;
 import las.bot.tennis.repository.GroupRepository;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class GroupService {
@@ -18,6 +22,16 @@ public class GroupService {
 
     public Group getGroup(String name) {
         return groupRepository.findById(name).orElse(null);
+    }
+
+    public List<Group> getAll() {
+        return Lists.newArrayList(groupRepository.findAll());
+    }
+
+    public List<Group> getAll(String filter) {
+        return getAll().stream()
+                .filter(group -> group.getName().toLowerCase().contains(filter.toLowerCase()))
+                .collect(Collectors.toList());
     }
 
     public void createGroup(Message message) {

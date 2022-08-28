@@ -18,13 +18,15 @@ public class User {
     @Id
     private Long chatId;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_group",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "group_id"))
     private List<Group> groups;
 
     private int state;
+    private String context;
+
     private String name;
     private String phone;
     private String description;
@@ -36,9 +38,19 @@ public class User {
     }
 
     public String toShortString() {
-        return name + "\n" +
-                phone + "\n" +
-                description;
+        StringBuilder desc = new StringBuilder(name).append("\n")
+                .append("\uD83D\uDCDE ").append(phone).append("\n")
+                .append(description).append("\n\n")
+                .append("Состоит в группах:");
+        if (groups.size() == 0) {
+            desc.append(" (пусто)");
+        } else {
+            for (Group group : groups) {
+                desc.append("\n\uD83C\uDFBE ").append(group.getName());
+            }
+        }
+
+        return desc.toString();
     }
 
 }
