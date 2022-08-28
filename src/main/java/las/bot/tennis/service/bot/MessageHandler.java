@@ -1,17 +1,19 @@
-package las.bot.tennis.service;
+package las.bot.tennis.service.bot;
 
-import las.bot.tennis.helper.KeyboardGenerator;
 import las.bot.tennis.model.Group;
 import las.bot.tennis.model.User;
+import las.bot.tennis.service.database.GroupService;
+import las.bot.tennis.service.database.UserService;
+import las.bot.tennis.service.helper.KeyboardGenerator;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 
 import java.util.List;
 
-import static las.bot.tennis.service.BotCommandsEnum.GO_TO_MAIN_MENU;
-import static las.bot.tennis.service.BotCommandsEnum.WRONG_COMMAND;
-import static las.bot.tennis.service.UserStateEnum.*;
+import static las.bot.tennis.service.bot.BotCommandsEnum.GO_TO_MAIN_MENU;
+import static las.bot.tennis.service.bot.BotCommandsEnum.WRONG_COMMAND;
+import static las.bot.tennis.service.bot.UserStateEnum.*;
 
 @Service
 public class MessageHandler {
@@ -32,7 +34,8 @@ public class MessageHandler {
     }
 
     public void process(Message message) {
-        BotCommandsEnum command = BotCommandsEnum.getByCommand(message.getText());
+        User currentUser = userService.getUser(message.getChatId());
+        BotCommandsEnum command = BotCommandsEnum.getByCommand(message.getText(), currentUser.getGroups());
 
         if (command == GO_TO_MAIN_MENU) {
             userService.changeStateTo(message.getChatId(), MAIN_MENU);
@@ -40,7 +43,6 @@ public class MessageHandler {
             return;
         }
 
-        User currentUser = userService.getUser(message.getChatId());
         UserStateEnum state = getById(currentUser.getState());
 
         switch (state) {

@@ -1,8 +1,9 @@
-package las.bot.tennis.service;
+package las.bot.tennis.service.database;
 
 import com.google.common.collect.Lists;
 import las.bot.tennis.model.Group;
 import las.bot.tennis.repository.GroupRepository;
+import las.bot.tennis.service.bot.SendMessageService;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
@@ -11,6 +12,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class GroupService {
+    public static final String ADMIN_GROUP = "Админы";
+    public static final String ALL_CLIENTS_GROUP = "Все";
 
     private final GroupRepository groupRepository;
     private final SendMessageService sendMessageService;

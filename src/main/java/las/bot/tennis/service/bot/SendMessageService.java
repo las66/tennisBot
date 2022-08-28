@@ -1,8 +1,9 @@
-package las.bot.tennis.service;
+package las.bot.tennis.service.bot;
 
-import las.bot.tennis.helper.KeyboardGenerator;
 import las.bot.tennis.model.TennisBot;
 import las.bot.tennis.model.User;
+import las.bot.tennis.service.database.UserService;
+import las.bot.tennis.service.helper.KeyboardGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -31,7 +32,7 @@ public class SendMessageService {
         User user = userService.getUser(userId);
         UserStateEnum userStateEnum = UserStateEnum.getById(user.getState());
         SendMessage sendMessage = new SendMessage(userId.toString(), userStateEnum.getMessage());
-        sendMessage.setReplyMarkup(keyboard == null ? keyboardGenerator.getKeyboardByState(userStateEnum) : keyboard);
+        sendMessage.setReplyMarkup(keyboard == null ? keyboardGenerator.getKeyboardByState(userStateEnum, user.getGroups()) : keyboard);
         sendMessage(sendMessage);
     }
 

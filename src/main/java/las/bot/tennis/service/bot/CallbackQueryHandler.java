@@ -1,14 +1,16 @@
-package las.bot.tennis.service;
+package las.bot.tennis.service.bot;
 
 import las.bot.tennis.model.TennisBot;
 import las.bot.tennis.model.User;
+import las.bot.tennis.service.database.GroupService;
+import las.bot.tennis.service.database.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import static las.bot.tennis.service.UserStateEnum.*;
+import static las.bot.tennis.service.bot.UserStateEnum.*;
 
 @Slf4j
 @Service

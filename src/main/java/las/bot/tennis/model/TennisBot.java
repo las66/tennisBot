@@ -1,7 +1,7 @@
 package las.bot.tennis.model;
 
 import las.bot.tennis.config.BotConfig;
-import las.bot.tennis.service.BotUpdateHandler;
+import las.bot.tennis.service.bot.BotUpdateHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;

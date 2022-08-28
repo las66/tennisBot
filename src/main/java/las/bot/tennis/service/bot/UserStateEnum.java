@@ -1,4 +1,4 @@
-package las.bot.tennis.service;
+package las.bot.tennis.service.bot;
 
 import lombok.Getter;
 

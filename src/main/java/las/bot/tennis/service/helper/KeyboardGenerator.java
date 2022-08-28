@@ -1,9 +1,10 @@
-package las.bot.tennis.helper;
+package las.bot.tennis.service.helper;
 
 import las.bot.tennis.model.Group;
 import las.bot.tennis.model.User;
-import las.bot.tennis.service.GroupService;
-import las.bot.tennis.service.UserStateEnum;
+import las.bot.tennis.service.bot.BotCommandsEnum;
+import las.bot.tennis.service.bot.UserStateEnum;
+import las.bot.tennis.service.database.GroupService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -17,7 +18,8 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static las.bot.tennis.service.BotCommandsEnum.*;
+import static las.bot.tennis.service.bot.BotCommandsEnum.*;
+import static las.bot.tennis.service.helper.PermissionHandler.hasPermission;
 
 @Component
 public class KeyboardGenerator {
@@ -28,15 +30,19 @@ public class KeyboardGenerator {
         this.groupService = groupService;
     }
 
-    public ReplyKeyboardMarkup replyKeyboard(List<List<String>> buttons) {
+    public ReplyKeyboardMarkup replyKeyboard(List<List<BotCommandsEnum>> buttons, List<Group> groups) {
         List<KeyboardRow> keyboardRows = new ArrayList<>();
 
-        for (List<String> button : buttons) {
+        for (List<BotCommandsEnum> button : buttons) {
             KeyboardRow row = new KeyboardRow();
-            for (String s : button) {
-                row.add(s);
+            for (BotCommandsEnum command : button) {
+                if (hasPermission(command, groups)) {
+                    row.add(command.getCommand());
+                }
             }
-            keyboardRows.add(row);
+            if (!row.isEmpty()) {
+                keyboardRows.add(row);
+            }
         }
 
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup(keyboardRows);
@@ -70,37 +76,37 @@ public class KeyboardGenerator {
     }
 
 
-    public ReplyKeyboard getKeyboardByState(UserStateEnum userStateEnum) {
+    public ReplyKeyboard getKeyboardByState(UserStateEnum userStateEnum, List<Group> groups) {
         switch (userStateEnum) {
             case MAIN_MENU:
                 return replyKeyboard(asList(
-                        asList(WORK_WITH_CLIENTS.getCommand()),
-                        asList(WORK_WITH_GROUPS.getCommand())
-                ));
+                        asList(WORK_WITH_CLIENTS),
+                        asList(WORK_WITH_GROUPS)
+                ), groups);
             case CLIENTS_WORK_MENU:
             case CLIENTS_NOT_FOUND:
                 return replyKeyboard(asList(
-                        asList(GET_CLIENT.getCommand()),
-                        asList(ADD_CLIENT_TO_GROUP.getCommand()),
-                        asList(GO_TO_MAIN_MENU.getCommand())
-                ));
+                        asList(GET_CLIENT),
+                        asList(ADD_CLIENT_TO_GROUP),
+                        asList(GO_TO_MAIN_MENU)
+                ), groups);
             case CLIENT_WORK_MENU:
                 return replyKeyboard(asList(
-                        asList(GO_TO_MAIN_MENU.getCommand())
-                ));
+                        asList(GO_TO_MAIN_MENU)
+                ), groups);
             case GROUPS_WORK_MENU:
             case GROUP_ALREADY_EXISTS:
                 return replyKeyboard(asList(
-                        asList(NEW_GROUP.getCommand()),
-                        asList(ADD_CLIENT_TO_GROUP.getCommand()),
-                        asList(GO_TO_MAIN_MENU.getCommand())
-                ));
+                        asList(NEW_GROUP),
+                        asList(ADD_CLIENT_TO_GROUP),
+                        asList(GO_TO_MAIN_MENU)
+                ), groups);
             case ADD_CLIENT_TO_GROUP_STEP_1:
                 return inlineGroupKeyboard(groupService.getAll());
             case CLIENT_ADDED_TO_GROUP:
                 return replyKeyboard(asList(
-                        asList(GO_TO_MAIN_MENU.getCommand())
-                ));
+                        asList(GO_TO_MAIN_MENU)
+                ), groups);
             default:
                 return null;
         }

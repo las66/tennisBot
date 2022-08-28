@@ -1,8 +1,10 @@
-package las.bot.tennis.service;
+package las.bot.tennis.service.database;
 
 import las.bot.tennis.model.Group;
 import las.bot.tennis.model.User;
 import las.bot.tennis.repository.UserRepository;
+import las.bot.tennis.service.bot.SendMessageService;
+import las.bot.tennis.service.bot.UserStateEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
