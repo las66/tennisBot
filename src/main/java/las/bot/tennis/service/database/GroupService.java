@@ -38,9 +38,14 @@ public class GroupService {
     }
 
     public void createGroup(Message message) {
-        Group group = new Group(message.getText());
+        String groupName = message.getText();
+        if (groupName.equals(ALL_CLIENTS_GROUP)) {
+            sendMessageService.sendMessage(message.getChatId(), "Имя \"" + groupName + "\" зарезервировано");
+            return;
+        }
+        Group group = new Group(groupName);
         groupRepository.save(group);
-        sendMessageService.sendMessage(message.getChatId(), "Группа " + message.getText() + " создана!");
+        sendMessageService.sendMessage(message.getChatId(), "Группа " + groupName + " создана!");
     }
 
 }
