@@ -6,6 +6,7 @@ import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.EMPTY_LIST;
@@ -35,7 +36,7 @@ public enum BotCommandsEnum {
         this.allowedGroups = allowedGroups;
     }
 
-    public static BotCommandsEnum getByCommand(String command, List<Group> groups) {
+    public static BotCommandsEnum getByCommand(String command, Set<Group> groups) {
         return Arrays.stream(values())
                 .filter(it -> it.getCommand().equals(command))
                 .filter(it -> PermissionHandler.hasPermission(it, groups))

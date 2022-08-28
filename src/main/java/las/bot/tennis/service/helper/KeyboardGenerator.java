@@ -15,6 +15,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -30,7 +31,7 @@ public class KeyboardGenerator {
         this.groupService = groupService;
     }
 
-    public ReplyKeyboardMarkup replyKeyboard(List<List<BotCommandsEnum>> buttons, List<Group> groups) {
+    public ReplyKeyboardMarkup replyKeyboard(List<List<BotCommandsEnum>> buttons, Set<Group> groups) {
         List<KeyboardRow> keyboardRows = new ArrayList<>();
 
         for (List<BotCommandsEnum> button : buttons) {
@@ -76,7 +77,7 @@ public class KeyboardGenerator {
     }
 
 
-    public ReplyKeyboard getKeyboardByState(UserStateEnum userStateEnum, List<Group> groups) {
+    public ReplyKeyboard getKeyboardByState(UserStateEnum userStateEnum, Set<Group> groups) {
         switch (userStateEnum) {
             case MAIN_MENU:
                 return replyKeyboard(asList(
