@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import las.bot.tennis.model.Group;
 import las.bot.tennis.repository.GroupRepository;
 import las.bot.tennis.service.bot.SendMessageService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
@@ -18,7 +19,7 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final SendMessageService sendMessageService;
 
-    public GroupService(GroupRepository groupRepository, SendMessageService sendMessageService) {
+    public GroupService(GroupRepository groupRepository, @Lazy SendMessageService sendMessageService) {
         this.groupRepository = groupRepository;
         this.sendMessageService = sendMessageService;
     }

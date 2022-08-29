@@ -86,6 +86,7 @@ public class KeyboardGenerator {
 
         switch (userStateEnum) {
             case ADD_CLIENT_TO_GROUP_STEP_1:
+            case SEND_MESSAGE_TO_GROUP_MENU:
                 return inlineGroupKeyboard(groupService.getAll());
 
             default:

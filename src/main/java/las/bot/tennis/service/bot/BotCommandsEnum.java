@@ -11,6 +11,9 @@ public enum BotCommandsEnum {
     GET_CLIENT("Найти клиента"),
     NEW_GROUP("Новая группа"),
     ADD_CLIENT_TO_GROUP("Добавить клиента в группу"),
+    SEND_MESSAGE("Отправить сообщение"),
+    SEND_MESSAGE_TO_GROUP("Группе"),
+    SEND_MESSAGE_TO_CLIENT("Клиенту"),
 
     WRONG_COMMAND("Неизвестная команда \uD83E\uDD14");
 

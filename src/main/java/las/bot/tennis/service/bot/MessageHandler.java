@@ -70,7 +70,7 @@ public class MessageHandler {
                 sendMessageService.sendStateMessage(message.getChatId());
                 return;
             case ADD_CLIENT_TO_GROUP_STEP_1:
-                userService.changeStateTo(message.getChatId(), ADD_CLIENT_TO_GROUP_STEP_2);
+            case SEND_MESSAGE_TO_GROUP_MENU:
                 List<Group> groups = groupService.getAll(message.getText());
                 sendMessageService.sendStateMessage(message.getChatId(), keyboardGenerator.inlineGroupKeyboard(groups));
                 return;
@@ -84,6 +84,13 @@ public class MessageHandler {
                     keyboard = keyboardGenerator.inlineUserKeyboard(users);
                 }
                 sendMessageService.sendStateMessage(message.getChatId(), keyboard);
+                return;
+            case MESSAGE_FOR_GROUP:
+                userService.changeStateTo(message.getChatId(), MAIN_MENU);
+                sendMessageService.sendMessageToGroup(message.getText(), currentUser.getContext());
+                String infoMessage = "Группе " + currentUser.getContext() + " успешно отправлено сообщение:\n" + message.getText();
+                sendMessageService.sendMessage(currentUser.getChatId(), infoMessage);
+                sendMessageService.sendStateMessage(message.getChatId());
                 return;
         }
 

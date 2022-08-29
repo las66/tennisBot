@@ -55,6 +55,12 @@ public class CallbackQueryHandler {
                 sendMessageService.sendMessage(currentUserId, addedUser.getName() + " добавлен в группу " + currentUser.getContext());
                 sendMessageService.sendStateMessage(currentUserId);
                 break;
+            case SEND_MESSAGE_TO_GROUP_MENU:
+                userService.changeStateTo(currentUserId, MESSAGE_FOR_GROUP, callbackQuery.getData());
+                groupInfo = groupService.getGroup(callbackQuery.getData()).toShortString();
+                sendMessageService.sendMessage(currentUserId, groupInfo);
+                sendMessageService.sendStateMessage(currentUserId);
+                break;
         }
 
         try {

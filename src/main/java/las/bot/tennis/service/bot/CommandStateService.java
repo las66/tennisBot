@@ -31,6 +31,12 @@ public class CommandStateService {
                 return NEW_GROUP_STEP_1;
             case ADD_CLIENT_TO_GROUP:
                 return ADD_CLIENT_TO_GROUP_STEP_1;
+            case SEND_MESSAGE:
+                return SEND_MESSAGE_MENU;
+            case SEND_MESSAGE_TO_CLIENT:
+                return SEND_MESSAGE_TO_CLIENT_MENU;
+            case SEND_MESSAGE_TO_GROUP:
+                return SEND_MESSAGE_TO_GROUP_MENU;
         }
         return null;
     }
@@ -39,8 +45,8 @@ public class CommandStateService {
         switch (state) {
             case MAIN_MENU:
                 return (asList(
-                        asList(WORK_WITH_CLIENTS),
-                        asList(WORK_WITH_GROUPS)
+                        asList(SEND_MESSAGE),
+                        asList(WORK_WITH_GROUPS, WORK_WITH_CLIENTS)
                 ));
             case CLIENTS_WORK_MENU:
             case CLIENTS_NOT_FOUND:
@@ -62,6 +68,11 @@ public class CommandStateService {
                 ));
             case CLIENT_ADDED_TO_GROUP:
                 return (asList(
+                        asList(GO_TO_MAIN_MENU)
+                ));
+            case SEND_MESSAGE_MENU:
+                return (asList(
+                        asList(BotCommandsEnum.SEND_MESSAGE_TO_GROUP, BotCommandsEnum.SEND_MESSAGE_TO_CLIENT),
                         asList(GO_TO_MAIN_MENU)
                 ));
             default:

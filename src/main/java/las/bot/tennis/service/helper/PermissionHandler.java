@@ -36,6 +36,9 @@ public class PermissionHandler {
             case GET_CLIENT:
             case NEW_GROUP:
             case ADD_CLIENT_TO_GROUP:
+            case SEND_MESSAGE:
+            case SEND_MESSAGE_TO_GROUP:
+            case SEND_MESSAGE_TO_CLIENT:
                 return singletonList(ADMIN_GROUP);
 
             case WRONG_COMMAND:
