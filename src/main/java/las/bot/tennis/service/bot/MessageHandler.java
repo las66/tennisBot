@@ -22,20 +22,23 @@ public class MessageHandler {
     private final GroupService groupService;
     private final SendMessageService sendMessageService;
     private final KeyboardGenerator keyboardGenerator;
+    private final CommandStateService commandStateService;
 
     public MessageHandler(UserService userService,
                           GroupService groupService,
                           SendMessageService sendMessageService,
-                          KeyboardGenerator keyboardGenerator) {
+                          KeyboardGenerator keyboardGenerator,
+                          CommandStateService commandStateService) {
         this.userService = userService;
         this.groupService = groupService;
         this.sendMessageService = sendMessageService;
         this.keyboardGenerator = keyboardGenerator;
+        this.commandStateService = commandStateService;
     }
 
     public void process(Message message) {
         User currentUser = userService.getUser(message.getChatId());
-        BotCommandsEnum command = BotCommandsEnum.getByCommand(message.getText(), currentUser.getGroups());
+        BotCommandsEnum command = commandStateService.getCommand(message.getText(), currentUser);
 
         if (command == GO_TO_MAIN_MENU) {
             userService.changeStateTo(message.getChatId(), MAIN_MENU);
@@ -87,7 +90,7 @@ public class MessageHandler {
         if (command == WRONG_COMMAND) {
             sendMessageService.sendMessage(message.getChatId(), WRONG_COMMAND.getCommand());
         } else {
-            userService.changeStateTo(message.getChatId(), command.getNextState());
+            userService.changeStateTo(message.getChatId(), commandStateService.getNextState(command));
         }
 
         sendMessageService.sendStateMessage(message.getChatId());

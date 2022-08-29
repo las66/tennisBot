@@ -3,6 +3,7 @@ package las.bot.tennis.service.helper;
 import las.bot.tennis.model.Group;
 import las.bot.tennis.model.User;
 import las.bot.tennis.service.bot.BotCommandsEnum;
+import las.bot.tennis.service.bot.CommandStateService;
 import las.bot.tennis.service.bot.UserStateEnum;
 import las.bot.tennis.service.database.GroupService;
 import org.springframework.context.annotation.Lazy;
@@ -17,21 +18,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static las.bot.tennis.service.bot.BotCommandsEnum.*;
 import static las.bot.tennis.service.helper.PermissionHandler.hasPermission;
 
 @Component
 public class KeyboardGenerator {
 
     private final GroupService groupService;
+    private final CommandStateService commandStateService;
 
-    public KeyboardGenerator(@Lazy GroupService groupService) {
+    public KeyboardGenerator(@Lazy GroupService groupService, CommandStateService commandStateService) {
         this.groupService = groupService;
+        this.commandStateService = commandStateService;
     }
 
-    public ReplyKeyboardMarkup replyKeyboard(List<List<BotCommandsEnum>> buttons, Set<Group> groups) {
+    public ReplyKeyboardMarkup getReplyKeyboard(List<List<BotCommandsEnum>> buttons, Set<Group> groups) {
         List<KeyboardRow> keyboardRows = new ArrayList<>();
 
         for (List<BotCommandsEnum> button : buttons) {
@@ -78,38 +79,18 @@ public class KeyboardGenerator {
 
 
     public ReplyKeyboard getKeyboardByState(UserStateEnum userStateEnum, Set<Group> groups) {
+        List<List<BotCommandsEnum>> keyboardSkeleton = commandStateService.getKeyboardSkeleton(userStateEnum);
+        if (keyboardSkeleton.size() != 0) {
+            return getReplyKeyboard(keyboardSkeleton, groups);
+        }
+
         switch (userStateEnum) {
-            case MAIN_MENU:
-                return replyKeyboard(asList(
-                        asList(WORK_WITH_CLIENTS),
-                        asList(WORK_WITH_GROUPS)
-                ), groups);
-            case CLIENTS_WORK_MENU:
-            case CLIENTS_NOT_FOUND:
-                return replyKeyboard(asList(
-                        asList(GET_CLIENT),
-                        asList(ADD_CLIENT_TO_GROUP),
-                        asList(GO_TO_MAIN_MENU)
-                ), groups);
-            case CLIENT_WORK_MENU:
-                return replyKeyboard(asList(
-                        asList(GO_TO_MAIN_MENU)
-                ), groups);
-            case GROUPS_WORK_MENU:
-            case GROUP_ALREADY_EXISTS:
-                return replyKeyboard(asList(
-                        asList(NEW_GROUP),
-                        asList(ADD_CLIENT_TO_GROUP),
-                        asList(GO_TO_MAIN_MENU)
-                ), groups);
             case ADD_CLIENT_TO_GROUP_STEP_1:
                 return inlineGroupKeyboard(groupService.getAll());
-            case CLIENT_ADDED_TO_GROUP:
-                return replyKeyboard(asList(
-                        asList(GO_TO_MAIN_MENU)
-                ), groups);
+
             default:
                 return null;
         }
     }
+
 }

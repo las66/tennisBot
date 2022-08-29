@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 @Getter
 public enum UserStateEnum {
+    ALL(-1, "Любое состояние", null),
     MAIN_MENU(0, "Главное меню", "Что надо сделать?"),
     CLIENTS_WORK_MENU(1, "Меню по работе с клиентами", "Что делать с клиентами?"),
     GET_CLIENT_STEP_1(2, "Поиск клиента", "Введите имя/фамилию/телефон/инфо клиента"),
