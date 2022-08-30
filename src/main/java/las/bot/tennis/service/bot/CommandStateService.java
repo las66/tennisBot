@@ -81,7 +81,7 @@ public class CommandStateService {
     }
 
     public BotCommandsEnum getCommand(String command, User user) {
-        List<BotCommandsEnum> commands = getKeyboardSkeleton(UserStateEnum.getById(user.getState())).stream()
+        List<BotCommandsEnum> commands = getKeyboardSkeleton(UserStateEnum.getById(user.getContext().getState())).stream()
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
         commands.add(GO_TO_MAIN_MENU);

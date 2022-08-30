@@ -24,8 +24,9 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "group_id"))
     private Set<Group> groups;
 
-    private int state;
-    private String context;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private UserContext context;
 
     private String name;
     private String phone;
@@ -34,7 +35,8 @@ public class User {
     public User(Long chatId, String name) {
         this.chatId = chatId;
         this.name = name;
-        this.state = 0;
+        this.context = new UserContext(chatId);
+        this.context.setUser(this);
     }
 
     public String toShortString() {

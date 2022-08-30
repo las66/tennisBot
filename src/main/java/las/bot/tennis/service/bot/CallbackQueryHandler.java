@@ -3,6 +3,7 @@ package las.bot.tennis.service.bot;
 import las.bot.tennis.model.TennisBot;
 import las.bot.tennis.model.User;
 import las.bot.tennis.service.database.GroupService;
+import las.bot.tennis.service.database.UserContextService;
 import las.bot.tennis.service.database.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,15 +18,18 @@ import static las.bot.tennis.service.bot.UserStateEnum.*;
 public class CallbackQueryHandler {
 
     private final UserService userService;
+    private final UserContextService userContextService;
     private final GroupService groupService;
     private final SendMessageService sendMessageService;
     private final TennisBot bot;
 
     public CallbackQueryHandler(UserService userService,
+                                UserContextService userContextService,
                                 GroupService groupService,
                                 SendMessageService sendMessageService,
                                 TennisBot bot) {
         this.userService = userService;
+        this.userContextService = userContextService;
         this.groupService = groupService;
         this.sendMessageService = sendMessageService;
         this.bot = bot;
@@ -34,29 +38,31 @@ public class CallbackQueryHandler {
     public void process(CallbackQuery callbackQuery) {
         Long currentUserId = callbackQuery.getMessage().getChatId();
         User currentUser = userService.getUser(currentUserId);
-        UserStateEnum state = UserStateEnum.getById(currentUser.getState());
+        UserStateEnum state = UserStateEnum.getById(currentUser.getContext().getState());
         switch (state) {
             case GET_CLIENT_STEP_2:
-                userService.changeStateTo(currentUserId, CLIENT_WORK_MENU);
+                userContextService.setState(currentUserId, CLIENT_WORK_MENU);
                 String clientInfo = userService.getUser(callbackQuery.getData()).toShortString();
                 sendMessageService.sendMessage(currentUserId, clientInfo);
                 sendMessageService.sendStateMessage(currentUserId);
                 break;
             case ADD_CLIENT_TO_GROUP_STEP_1:
-                userService.changeStateTo(currentUserId, ADD_CLIENT_TO_GROUP_STEP_2, callbackQuery.getData());
+                userContextService.setState(currentUserId, ADD_CLIENT_TO_GROUP_STEP_2);
+                userContextService.setGroup(currentUserId, callbackQuery.getData());
                 String groupInfo = groupService.getGroup(callbackQuery.getData()).toShortString();
                 sendMessageService.sendMessage(currentUserId, groupInfo);
                 sendMessageService.sendStateMessage(currentUserId);
                 break;
             case ADD_CLIENT_TO_GROUP_STEP_3:
-                userService.changeStateTo(currentUserId, CLIENT_ADDED_TO_GROUP, currentUser.getContext());
-                userService.addToGroup(callbackQuery.getData(), groupService.getGroup(currentUser.getContext()));
+                userContextService.setState(currentUserId, CLIENT_ADDED_TO_GROUP);
+                userService.addToGroup(callbackQuery.getData(), groupService.getGroup(currentUser.getContext().getUserGroup()));
                 User addedUser = userService.getUser(callbackQuery.getData());
                 sendMessageService.sendMessage(currentUserId, addedUser.getName() + " добавлен в группу " + currentUser.getContext());
                 sendMessageService.sendStateMessage(currentUserId);
                 break;
             case SEND_MESSAGE_TO_GROUP_MENU:
-                userService.changeStateTo(currentUserId, MESSAGE_FOR_GROUP, callbackQuery.getData());
+                userContextService.setState(currentUserId, MESSAGE_FOR_GROUP);
+                userContextService.setGroup(currentUserId, callbackQuery.getData());
                 groupInfo = groupService.getGroup(callbackQuery.getData()).toShortString();
                 sendMessageService.sendMessage(currentUserId, groupInfo);
                 sendMessageService.sendStateMessage(currentUserId);

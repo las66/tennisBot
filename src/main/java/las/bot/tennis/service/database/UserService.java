@@ -4,7 +4,6 @@ import las.bot.tennis.model.Group;
 import las.bot.tennis.model.User;
 import las.bot.tennis.repository.UserRepository;
 import las.bot.tennis.service.bot.SendMessageService;
-import las.bot.tennis.service.bot.UserStateEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -41,17 +40,6 @@ public class UserService {
             userRepository.save(user);
             sendMessageService.sendMessage(message.getChatId(), "Вы зарегистрированы!");
         }
-    }
-
-    public void changeStateTo(Long userId, UserStateEnum state, String context) {
-        User user = getUser(userId);
-        user.setContext(context);
-        user.setState(state.getStateId());
-        userRepository.save(user);
-    }
-
-    public void changeStateTo(Long userId, UserStateEnum state) {
-        changeStateTo(userId, state, null);
     }
 
     public List<User> findUsers(String text) {

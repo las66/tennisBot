@@ -35,7 +35,7 @@ public class SendMessageService {
 
     public void sendStateMessage(Long userId, ReplyKeyboard keyboard) {
         User user = userService.getUser(userId);
-        UserStateEnum userStateEnum = UserStateEnum.getById(user.getState());
+        UserStateEnum userStateEnum = UserStateEnum.getById(user.getContext().getState());
         SendMessage sendMessage = new SendMessage(userId.toString(), userStateEnum.getMessage());
         sendMessage.setReplyMarkup(keyboard == null ? keyboardGenerator.getKeyboardByState(userStateEnum, user.getGroups()) : keyboard);
         sendMessage(sendMessage);
