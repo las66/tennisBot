@@ -57,9 +57,9 @@ public class UserService {
     public List<User> findUsers(String text) {
         List<User> users = new ArrayList<>();
         userRepository.findAll().forEach(user -> {
-            if (user.getName().toLowerCase().contains(text.toLowerCase())
-                    || user.getPhone().toLowerCase().contains(text.toLowerCase())
-                    || user.getDescription().toLowerCase().contains(text.toLowerCase())) {
+            if ((user.getName() != null && user.getName().toLowerCase().contains(text.toLowerCase()))
+                    || (user.getPhone() != null && user.getPhone().toLowerCase().contains(text.toLowerCase()))
+                    || (user.getDescription() != null && user.getDescription().toLowerCase().contains(text.toLowerCase()))) {
                 users.add(user);
             }
         });
