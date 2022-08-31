@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum BotCommandsEnum {
     START("/start"),
-    GO_TO_MAIN_MENU("Главное меню"),
+    GO_TO_MAIN_MENU("⬅️ Главное меню"),
     WORK_WITH_CLIENTS("Клиенты"),
     WORK_WITH_GROUPS("Группы"),
     GET_CLIENT("Найти клиента"),
@@ -15,7 +15,7 @@ public enum BotCommandsEnum {
     SEND_MESSAGE_TO_GROUP("Группе"),
     SEND_MESSAGE_TO_CLIENT("Клиенту"),
 
-    WRONG_COMMAND("Неизвестная команда \uD83E\uDD14");
+    WRONG_COMMAND("Неизвестная команда \uD83E\uDD37\u200D♀️");
 
     private final String command;
 

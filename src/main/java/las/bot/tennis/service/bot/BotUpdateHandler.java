@@ -29,6 +29,8 @@ public class BotUpdateHandler {
             if (message != null) {
                 userService.createUserIfAbsent(message);
                 messageHandler.process(message);
+            } else {
+                log.debug("Неизвестный апдейт:" + update);
             }
         }
     }

@@ -12,7 +12,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 
 import java.util.List;
 
-import static las.bot.tennis.service.bot.BotCommandsEnum.GO_TO_MAIN_MENU;
 import static las.bot.tennis.service.bot.BotCommandsEnum.WRONG_COMMAND;
 import static las.bot.tennis.service.bot.UserStateEnum.*;
 
@@ -24,34 +23,26 @@ public class MessageHandler {
     private final GroupService groupService;
     private final SendMessageService sendMessageService;
     private final KeyboardGenerator keyboardGenerator;
-    private final CommandStateService commandStateService;
 
     public MessageHandler(UserService userService,
                           UserContextService userContextService,
                           GroupService groupService,
                           SendMessageService sendMessageService,
-                          KeyboardGenerator keyboardGenerator,
-                          CommandStateService commandStateService) {
+                          KeyboardGenerator keyboardGenerator) {
         this.userService = userService;
         this.userContextService = userContextService;
         this.groupService = groupService;
         this.sendMessageService = sendMessageService;
         this.keyboardGenerator = keyboardGenerator;
-        this.commandStateService = commandStateService;
     }
 
     public void process(Message message) {
         User currentUser = userService.getUser(message.getChatId());
-        BotCommandsEnum command = commandStateService.getCommand(message.getText(), currentUser);
-
-        if (command == GO_TO_MAIN_MENU) {
-            userContextService.setState(message.getChatId(), MAIN_MENU);
-            sendMessageService.sendStateMessage(message.getChatId());
+        UserStateEnum state = getById(currentUser.getContext().getState());
+        if (message.getText().startsWith(BotCommandsEnum.START.getCommand())) {
+            sendMessageService.sendMessage(currentUser.getChatId(), "Тут будет приветственное сообщение"); //todo
             return;
         }
-
-        UserStateEnum state = getById(currentUser.getContext().getState());
-
         switch (state) {
             case GET_CLIENT_STEP_1:
                 List<User> users = userService.findUsers(message.getText());
@@ -63,7 +54,7 @@ public class MessageHandler {
                     keyboard = keyboardGenerator.inlineUserKeyboard(users);
                 }
                 sendMessageService.sendStateMessage(message.getChatId(), keyboard);
-                return;
+                break;
             case NEW_GROUP_STEP_1:
                 if (groupService.getGroup(message.getText()) != null) {
                     userContextService.setState(message.getChatId(), GROUP_ALREADY_EXISTS);
@@ -72,12 +63,12 @@ public class MessageHandler {
                     userContextService.setState(message.getChatId(), MAIN_MENU);
                 }
                 sendMessageService.sendStateMessage(message.getChatId());
-                return;
+                break;
             case ADD_CLIENT_TO_GROUP_STEP_1:
             case SEND_MESSAGE_TO_GROUP_MENU:
                 List<Group> groups = groupService.getAll(message.getText());
                 sendMessageService.sendStateMessage(message.getChatId(), keyboardGenerator.inlineGroupKeyboard(groups));
-                return;
+                break;
             case ADD_CLIENT_TO_GROUP_STEP_2:
                 users = userService.findUsers(message.getText());
                 keyboard = null;
@@ -88,23 +79,19 @@ public class MessageHandler {
                     keyboard = keyboardGenerator.inlineUserKeyboard(users);
                 }
                 sendMessageService.sendStateMessage(message.getChatId(), keyboard);
-                return;
+                break;
             case MESSAGE_FOR_GROUP:
                 userContextService.setState(message.getChatId(), MAIN_MENU);
                 sendMessageService.sendMessageToGroup(message.getText(), currentUser.getContext().getUserGroup());
                 String infoMessage = "Группе " + currentUser.getContext() + " успешно отправлено сообщение:\n" + message.getText();
                 sendMessageService.sendMessage(currentUser.getChatId(), infoMessage);
                 sendMessageService.sendStateMessage(message.getChatId());
-                return;
+                break;
+            default:
+                sendMessageService.sendMessage(currentUser.getChatId(), WRONG_COMMAND.getCommand());
+                sendMessageService.sendStateMessage(message.getChatId());
+                break;
         }
-
-        if (command == WRONG_COMMAND) {
-            sendMessageService.sendMessage(message.getChatId(), WRONG_COMMAND.getCommand());
-        } else {
-            userContextService.setState(message.getChatId(), commandStateService.getNextState(command));
-        }
-
-        sendMessageService.sendStateMessage(message.getChatId());
     }
 
 }

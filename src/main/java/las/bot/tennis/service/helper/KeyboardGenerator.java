@@ -10,9 +10,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,25 +30,28 @@ public class KeyboardGenerator {
         this.commandStateService = commandStateService;
     }
 
-    public ReplyKeyboardMarkup getReplyKeyboard(List<List<BotCommandsEnum>> buttons, Set<Group> groups) {
-        List<KeyboardRow> keyboardRows = new ArrayList<>();
+    public InlineKeyboardMarkup getInlineKeyboard(List<List<BotCommandsEnum>> keyboardSkeleton, Set<Group> groups) {
+        List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
-        for (List<BotCommandsEnum> button : buttons) {
-            KeyboardRow row = new KeyboardRow();
-            for (BotCommandsEnum command : button) {
+        for (List<BotCommandsEnum> rowSkeleton : keyboardSkeleton) {
+            List<InlineKeyboardButton> row = new ArrayList<>();
+            for (BotCommandsEnum command : rowSkeleton) {
                 if (hasPermission(command, groups)) {
-                    row.add(command.getCommand());
+                    InlineKeyboardButton button = new InlineKeyboardButton(command.getCommand());
+                    button.setCallbackData(command.name());
+                    row.add(button);
                 }
             }
             if (!row.isEmpty()) {
-                keyboardRows.add(row);
+                keyboard.add(row);
             }
         }
 
-        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup(keyboardRows);
-        replyKeyboardMarkup.setOneTimeKeyboard(true);
-        replyKeyboardMarkup.setResizeKeyboard(true);
-        return replyKeyboardMarkup;
+//        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup(keyboardRows);
+//        replyKeyboardMarkup.setOneTimeKeyboard(true);
+//        replyKeyboardMarkup.setResizeKeyboard(true);
+
+        return new InlineKeyboardMarkup(keyboard);
     }
 
     public InlineKeyboardMarkup inlineUserKeyboard(List<User> users) {
@@ -81,7 +82,7 @@ public class KeyboardGenerator {
     public ReplyKeyboard getKeyboardByState(UserStateEnum userStateEnum, Set<Group> groups) {
         List<List<BotCommandsEnum>> keyboardSkeleton = commandStateService.getKeyboardSkeleton(userStateEnum);
         if (keyboardSkeleton.size() != 0) {
-            return getReplyKeyboard(keyboardSkeleton, groups);
+            return getInlineKeyboard(keyboardSkeleton, groups);
         }
 
         switch (userStateEnum) {

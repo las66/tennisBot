@@ -1,12 +1,8 @@
 package las.bot.tennis.service.bot;
 
-import las.bot.tennis.model.User;
-import las.bot.tennis.service.helper.PermissionHandler;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.EMPTY_LIST;
@@ -78,19 +74,6 @@ public class CommandStateService {
             default:
                 return EMPTY_LIST;
         }
-    }
-
-    public BotCommandsEnum getCommand(String command, User user) {
-        List<BotCommandsEnum> commands = getKeyboardSkeleton(UserStateEnum.getById(user.getContext().getState())).stream()
-                .flatMap(List::stream)
-                .collect(Collectors.toList());
-        commands.add(GO_TO_MAIN_MENU);
-        return Arrays.stream(BotCommandsEnum.values())
-                .filter(it -> it.getCommand().equals(command))
-                .filter(commands::contains)
-                .filter(it -> PermissionHandler.hasPermission(it, user.getGroups()))
-                .findAny()
-                .orElse(WRONG_COMMAND);
     }
 
 }
