@@ -24,6 +24,7 @@ public class UserContext {
 
     private int state;
     private String userGroup;
+    private Integer menuMessageId;
 
     public UserContext(Long userId) {
         this.userId = userId;

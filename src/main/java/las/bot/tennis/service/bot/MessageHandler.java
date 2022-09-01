@@ -39,6 +39,7 @@ public class MessageHandler {
     public void process(Message message) {
         User currentUser = userService.getUser(message.getChatId());
         UserStateEnum state = getById(currentUser.getContext().getState());
+        userContextService.setMenuMessageId(currentUser.getChatId(), null);
         if (message.getText().startsWith(BotCommandsEnum.START.getCommand())) {
             sendMessageService.sendMessage(currentUser.getChatId(), "Тут будет приветственное сообщение"); //todo
             return;

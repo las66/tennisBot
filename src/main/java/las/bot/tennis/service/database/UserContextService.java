@@ -32,4 +32,10 @@ public class UserContextService {
         userContextRepository.save(userContext);
     }
 
+    public void setMenuMessageId(Long userId, Integer menuMessageId) {
+        UserContext userContext = getContext(userId);
+        userContext.setMenuMessageId(menuMessageId);
+        userContextRepository.save(userContext);
+    }
+
 }

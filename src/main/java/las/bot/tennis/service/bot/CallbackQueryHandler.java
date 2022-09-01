@@ -40,12 +40,6 @@ public class CallbackQueryHandler {
     }
 
     public void process(CallbackQuery callbackQuery) {
-        try {
-            bot.execute(new AnswerCallbackQuery(callbackQuery.getId()));
-        } catch (TelegramApiException e) {
-            log.error("Ошибка при отправке AnswerCallbackQuery", e);
-        }
-
         Long currentUserId = callbackQuery.getMessage().getChatId();
         User currentUser = userService.getUser(currentUserId);
         String data = callbackQuery.getData();
@@ -87,6 +81,12 @@ public class CallbackQueryHandler {
                 sendMessageService.sendStateMessage(currentUserId);
                 break;
         }
+        try {
+            bot.execute(new AnswerCallbackQuery(callbackQuery.getId()));
+        } catch (TelegramApiException e) {
+            log.error("Ошибка при отправке AnswerCallbackQuery", e);
+        }
+
     }
 
 }

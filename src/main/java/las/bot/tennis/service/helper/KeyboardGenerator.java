@@ -9,7 +9,6 @@ import las.bot.tennis.service.database.GroupService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import java.util.ArrayList;
@@ -79,7 +78,7 @@ public class KeyboardGenerator {
     }
 
 
-    public ReplyKeyboard getKeyboardByState(UserStateEnum userStateEnum, Set<Group> groups) {
+    public InlineKeyboardMarkup getKeyboardByState(UserStateEnum userStateEnum, Set<Group> groups) {
         List<List<BotCommandsEnum>> keyboardSkeleton = commandStateService.getKeyboardSkeleton(userStateEnum);
         if (keyboardSkeleton.size() != 0) {
             return getInlineKeyboard(keyboardSkeleton, groups);

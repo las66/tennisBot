@@ -27,7 +27,7 @@ public class BotInitializer {
             botsApi.registerBot(bot);
             log.info("Инициализация бота: Готово");
         } catch (TelegramApiException e) {
-            log.error("Ошибка при инициализации бота: " + e.getMessage());
+            log.error("Ошибка при инициализации бота", e);
         }
     }
 
