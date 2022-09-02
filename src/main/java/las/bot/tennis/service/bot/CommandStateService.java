@@ -2,10 +2,10 @@ package las.bot.tennis.service.bot;
 
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.EMPTY_LIST;
 import static las.bot.tennis.service.bot.BotCommandsEnum.*;
 import static las.bot.tennis.service.bot.UserStateEnum.*;
 
@@ -25,6 +25,8 @@ public class CommandStateService {
                 return GET_CLIENT_STEP_1;
             case NEW_GROUP:
                 return NEW_GROUP_STEP_1;
+            case RENAME_GROUP:
+                return RENAME_GROUP_STEP_1;
             case DELETE_GROUP:
                 return DELETE_GROUP_STEP_1;
             case ADD_CLIENT_TO_GROUP:
@@ -54,24 +56,24 @@ public class CommandStateService {
                 ));
             case CLIENT_WORK_MENU:
                 return (asList(
-                        EMPTY_LIST
+                        new ArrayList<>()
                 ));
             case GROUPS_WORK_MENU:
             case GROUP_ALREADY_EXISTS:
                 return (asList(
-                        asList(NEW_GROUP, DELETE_GROUP),
+                        asList(NEW_GROUP, RENAME_GROUP, DELETE_GROUP),
                         asList(ADD_CLIENT_TO_GROUP)
                 ));
             case CLIENT_ADDED_TO_GROUP:
                 return (asList(
-                        EMPTY_LIST
+                        new ArrayList<>()
                 ));
             case SEND_MESSAGE_MENU:
                 return (asList(
                         asList(BotCommandsEnum.SEND_MESSAGE_TO_GROUP, BotCommandsEnum.SEND_MESSAGE_TO_CLIENT)
                 ));
             default:
-                return EMPTY_LIST;
+                return new ArrayList<>();
         }
     }
 

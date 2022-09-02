@@ -49,8 +49,34 @@ public class GroupService {
         sendMessageService.sendMessage(message.getChatId(), "Группа " + groupName + " создана!");
     }
 
-    public void deleteGroup(String data) {
-        groupRepository.delete(getGroup(data));
+    public void deleteGroup(Long userId, String name) {
+        if (ADMIN_GROUP.equals(name)) {
+            sendMessageService.sendMessage(userId, "Нельзя удалять группу " + ADMIN_GROUP);
+        } else {
+            Group group = getGroup(name);
+            deleteGroup(group);
+            sendMessageService.sendMessage(userId, "Группа " + group.toShortString() + " удалена");
+        }
+    }
+
+    public void renameGroup(Long userId, String name, String newName) {
+        if (ADMIN_GROUP.equals(name)) {
+            sendMessageService.sendMessage(userId, "Нельзя переименовывать группу " + ADMIN_GROUP);
+        } else {
+            Group group = getGroup(name);
+            group.setName(newName);
+            groupRepository.save(group);
+            deleteGroup(name);
+            sendMessageService.sendMessage(userId, "Группа " + name + " переименована в " + newName);
+        }
+    }
+
+    private void deleteGroup(String name) {
+        deleteGroup(getGroup(name));
+    }
+
+    private void deleteGroup(Group group) {
+        groupRepository.delete(group);
     }
 
 }

@@ -1,5 +1,6 @@
 package las.bot.tennis.service.bot;
 
+import las.bot.tennis.model.Group;
 import las.bot.tennis.model.TennisBot;
 import las.bot.tennis.model.User;
 import las.bot.tennis.service.database.GroupService;
@@ -56,7 +57,7 @@ public class CallbackQueryHandler {
                     break;
                 case ADD_CLIENT_TO_GROUP_STEP_1:
                     userContextService.setState(currentUserId, ADD_CLIENT_TO_GROUP_STEP_2);
-                    userContextService.setGroup(currentUserId, data);
+                    userContextService.setUserGroup(currentUserId, data);
                     String groupInfo = groupService.getGroup(data).toShortString();
                     sendMessageService.sendMessage(currentUserId, groupInfo);
                     break;
@@ -64,19 +65,24 @@ public class CallbackQueryHandler {
                     userContextService.setState(currentUserId, CLIENT_ADDED_TO_GROUP);
                     userService.addToGroup(data, groupService.getGroup(currentUser.getContext().getUserGroup()));
                     User addedUser = userService.getUser(data);
-                    sendMessageService.sendMessage(currentUserId, addedUser.getName() + " добавлен в группу " + currentUser.getContext());
+                    sendMessageService.sendMessage(currentUserId, addedUser.getName() + " добавлен в группу " + currentUser.getContext().getUserGroup());
                     break;
                 case SEND_MESSAGE_TO_GROUP_MENU:
                     userContextService.setState(currentUserId, MESSAGE_FOR_GROUP);
-                    userContextService.setGroup(currentUserId, data);
+                    userContextService.setUserGroup(currentUserId, data);
                     groupInfo = groupService.getGroup(data).toShortString();
                     sendMessageService.sendMessage(currentUserId, groupInfo);
                     break;
                 case DELETE_GROUP_STEP_1:
-                    groupInfo = groupService.getGroup(data).toShortString();
-                    groupService.deleteGroup(data);
+                    groupService.deleteGroup(currentUserId, data);
                     userContextService.setState(currentUserId, GROUPS_WORK_MENU);
-                    sendMessageService.sendMessage(currentUserId, "Группа " + groupInfo + " удалена");
+                    break;
+                case RENAME_GROUP_STEP_1:
+                    Group group = groupService.getGroup(data);
+                    groupInfo = group.toShortString();
+                    sendMessageService.sendMessage(currentUserId, "Выбрана группа " + groupInfo);
+                    userContextService.setState(currentUserId, RENAME_GROUP_STEP_2);
+                    userContextService.setUserGroup(currentUserId, group.getName());
                     break;
                 default:
                     if (WRONG_COMMAND.name().equals(data)) {

@@ -68,6 +68,7 @@ public class MessageHandler {
             case ADD_CLIENT_TO_GROUP_STEP_1:
             case SEND_MESSAGE_TO_GROUP_MENU:
             case DELETE_GROUP_STEP_1:
+            case RENAME_GROUP_STEP_1:
                 List<Group> groups = groupService.getAll(message.getText());
                 sendMessageService.sendStateMessage(message.getChatId(), keyboardGenerator.inlineGroupKeyboard(groups));
                 break;
@@ -85,10 +86,20 @@ public class MessageHandler {
             case MESSAGE_FOR_GROUP:
                 userContextService.setState(message.getChatId(), MAIN_MENU);
                 sendMessageService.sendMessageToGroup(message.getText(), currentUser.getContext().getUserGroup());
-                String infoMessage = "Группе " + currentUser.getContext() + " успешно отправлено сообщение:\n" + message.getText();
+                String infoMessage = "Группе " + currentUser.getContext().getUserGroup() + " успешно отправлено сообщение:\n" + message.getText();
                 sendMessageService.sendMessage(currentUser.getChatId(), infoMessage);
                 sendMessageService.sendStateMessage(message.getChatId());
                 break;
+            case RENAME_GROUP_STEP_2:
+                if (groupService.getGroup(message.getText()) != null) {
+                    sendMessageService.sendMessage(message.getChatId(), GROUP_ALREADY_EXISTS.getMessage());
+                } else {
+                    groupService.renameGroup(currentUser.getChatId(), currentUser.getContext().getUserGroup(), message.getText());
+                    userContextService.setState(message.getChatId(), MAIN_MENU);
+                }
+                sendMessageService.sendStateMessage(message.getChatId());
+                break;
+
             default:
                 sendMessageService.sendMessage(currentUser.getChatId(), WRONG_COMMAND.getCommand());
                 sendMessageService.sendStateMessage(message.getChatId());

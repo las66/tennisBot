@@ -91,6 +91,7 @@ public class KeyboardGenerator {
             case ADD_CLIENT_TO_GROUP_STEP_1:
             case SEND_MESSAGE_TO_GROUP_MENU:
             case DELETE_GROUP_STEP_1:
+            case RENAME_GROUP_STEP_1:
                 return inlineGroupKeyboard(groupService.getAll());
 
             default:
