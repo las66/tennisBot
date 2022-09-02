@@ -36,7 +36,7 @@ public class UserService {
         if (getUser(message.getChatId()) == null) {
             String lastName = message.getFrom().getLastName();
             String name = (lastName == null ? "" : lastName + " ") + message.getFrom().getFirstName();
-            User user = new User(message.getChatId(), name);
+            User user = new User(message.getChatId(), name, message.getFrom().getUserName());
             userRepository.save(user);
             sendMessageService.sendMessage(message.getChatId(), "Вы зарегистрированы!");
         }

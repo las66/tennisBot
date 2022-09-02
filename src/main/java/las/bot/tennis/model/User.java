@@ -32,8 +32,9 @@ public class User {
     private String phone;
     private String description;
 
-    public User(Long chatId, String name) {
+    public User(Long chatId, String name, String description) {
         this.chatId = chatId;
+        this.description = description;
         this.name = name;
         this.context = new UserContext(chatId);
         this.context.setUser(this);
