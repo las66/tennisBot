@@ -67,6 +67,7 @@ public class MessageHandler {
                 break;
             case ADD_CLIENT_TO_GROUP_STEP_1:
             case SEND_MESSAGE_TO_GROUP_MENU:
+            case DELETE_GROUP_STEP_1:
                 List<Group> groups = groupService.getAll(message.getText());
                 sendMessageService.sendStateMessage(message.getChatId(), keyboardGenerator.inlineGroupKeyboard(groups));
                 break;

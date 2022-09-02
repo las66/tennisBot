@@ -25,6 +25,8 @@ public class CommandStateService {
                 return GET_CLIENT_STEP_1;
             case NEW_GROUP:
                 return NEW_GROUP_STEP_1;
+            case DELETE_GROUP:
+                return DELETE_GROUP_STEP_1;
             case ADD_CLIENT_TO_GROUP:
                 return ADD_CLIENT_TO_GROUP_STEP_1;
             case SEND_MESSAGE:
@@ -58,7 +60,7 @@ public class CommandStateService {
             case GROUPS_WORK_MENU:
             case GROUP_ALREADY_EXISTS:
                 return (asList(
-                        asList(NEW_GROUP),
+                        asList(NEW_GROUP, DELETE_GROUP),
                         asList(ADD_CLIENT_TO_GROUP),
                         asList(GO_TO_MAIN_MENU)
                 ));

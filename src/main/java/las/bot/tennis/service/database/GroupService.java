@@ -49,4 +49,8 @@ public class GroupService {
         sendMessageService.sendMessage(message.getChatId(), "Группа " + groupName + " создана!");
     }
 
+    public void deleteGroup(String data) {
+        groupRepository.delete(getGroup(data));
+    }
+
 }

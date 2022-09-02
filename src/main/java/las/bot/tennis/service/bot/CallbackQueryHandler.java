@@ -49,28 +49,30 @@ public class CallbackQueryHandler {
                 userContextService.setState(currentUserId, CLIENT_WORK_MENU);
                 String clientInfo = userService.getUser(data).toShortString();
                 sendMessageService.sendMessage(currentUserId, clientInfo);
-                sendMessageService.sendStateMessage(currentUserId);
                 break;
             case ADD_CLIENT_TO_GROUP_STEP_1:
                 userContextService.setState(currentUserId, ADD_CLIENT_TO_GROUP_STEP_2);
                 userContextService.setGroup(currentUserId, data);
                 String groupInfo = groupService.getGroup(data).toShortString();
                 sendMessageService.sendMessage(currentUserId, groupInfo);
-                sendMessageService.sendStateMessage(currentUserId);
                 break;
             case ADD_CLIENT_TO_GROUP_STEP_3:
                 userContextService.setState(currentUserId, CLIENT_ADDED_TO_GROUP);
                 userService.addToGroup(data, groupService.getGroup(currentUser.getContext().getUserGroup()));
                 User addedUser = userService.getUser(data);
                 sendMessageService.sendMessage(currentUserId, addedUser.getName() + " добавлен в группу " + currentUser.getContext());
-                sendMessageService.sendStateMessage(currentUserId);
                 break;
             case SEND_MESSAGE_TO_GROUP_MENU:
                 userContextService.setState(currentUserId, MESSAGE_FOR_GROUP);
                 userContextService.setGroup(currentUserId, data);
                 groupInfo = groupService.getGroup(data).toShortString();
                 sendMessageService.sendMessage(currentUserId, groupInfo);
-                sendMessageService.sendStateMessage(currentUserId);
+                break;
+            case DELETE_GROUP_STEP_1:
+                groupInfo = groupService.getGroup(data).toShortString();
+                groupService.deleteGroup(data);
+                userContextService.setState(currentUserId, GROUPS_WORK_MENU);
+                sendMessageService.sendMessage(currentUserId, "Группа " + groupInfo + " удалена");
                 break;
             default:
                 if (WRONG_COMMAND.name().equals(data)) {
@@ -78,9 +80,10 @@ public class CallbackQueryHandler {
                 } else {
                     userContextService.setState(currentUserId, commandStateService.getNextState(BotCommandsEnum.valueOf(data)));
                 }
-                sendMessageService.sendStateMessage(currentUserId);
                 break;
         }
+        sendMessageService.sendStateMessage(currentUserId);
+
         try {
             bot.execute(new AnswerCallbackQuery(callbackQuery.getId()));
         } catch (TelegramApiException e) {

@@ -35,6 +35,7 @@ public class PermissionHandler {
             case WORK_WITH_GROUPS:
             case GET_CLIENT:
             case NEW_GROUP:
+            case DELETE_GROUP:
             case ADD_CLIENT_TO_GROUP:
             case SEND_MESSAGE:
             case SEND_MESSAGE_TO_GROUP:
