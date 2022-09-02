@@ -11,6 +11,7 @@ import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import static las.bot.tennis.service.bot.BotCommandsEnum.GO_TO_MAIN_MENU;
 import static las.bot.tennis.service.bot.BotCommandsEnum.WRONG_COMMAND;
 import static las.bot.tennis.service.bot.UserStateEnum.*;
 
@@ -43,44 +44,48 @@ public class CallbackQueryHandler {
         Long currentUserId = callbackQuery.getMessage().getChatId();
         User currentUser = userService.getUser(currentUserId);
         String data = callbackQuery.getData();
-        UserStateEnum state = UserStateEnum.getById(currentUser.getContext().getState());
-        switch (state) {
-            case GET_CLIENT_STEP_2:
-                userContextService.setState(currentUserId, CLIENT_WORK_MENU);
-                String clientInfo = userService.getUser(data).toShortString();
-                sendMessageService.sendMessage(currentUserId, clientInfo);
-                break;
-            case ADD_CLIENT_TO_GROUP_STEP_1:
-                userContextService.setState(currentUserId, ADD_CLIENT_TO_GROUP_STEP_2);
-                userContextService.setGroup(currentUserId, data);
-                String groupInfo = groupService.getGroup(data).toShortString();
-                sendMessageService.sendMessage(currentUserId, groupInfo);
-                break;
-            case ADD_CLIENT_TO_GROUP_STEP_3:
-                userContextService.setState(currentUserId, CLIENT_ADDED_TO_GROUP);
-                userService.addToGroup(data, groupService.getGroup(currentUser.getContext().getUserGroup()));
-                User addedUser = userService.getUser(data);
-                sendMessageService.sendMessage(currentUserId, addedUser.getName() + " добавлен в группу " + currentUser.getContext());
-                break;
-            case SEND_MESSAGE_TO_GROUP_MENU:
-                userContextService.setState(currentUserId, MESSAGE_FOR_GROUP);
-                userContextService.setGroup(currentUserId, data);
-                groupInfo = groupService.getGroup(data).toShortString();
-                sendMessageService.sendMessage(currentUserId, groupInfo);
-                break;
-            case DELETE_GROUP_STEP_1:
-                groupInfo = groupService.getGroup(data).toShortString();
-                groupService.deleteGroup(data);
-                userContextService.setState(currentUserId, GROUPS_WORK_MENU);
-                sendMessageService.sendMessage(currentUserId, "Группа " + groupInfo + " удалена");
-                break;
-            default:
-                if (WRONG_COMMAND.name().equals(data)) {
-                    sendMessageService.sendMessage(currentUserId, WRONG_COMMAND.getCommand());
-                } else {
-                    userContextService.setState(currentUserId, commandStateService.getNextState(BotCommandsEnum.valueOf(data)));
-                }
-                break;
+        if (GO_TO_MAIN_MENU.name().equals(data)) {
+            userContextService.setState(currentUserId, commandStateService.getNextState(GO_TO_MAIN_MENU));
+        } else {
+            UserStateEnum state = UserStateEnum.getById(currentUser.getContext().getState());
+            switch (state) {
+                case GET_CLIENT_STEP_2:
+                    userContextService.setState(currentUserId, CLIENT_WORK_MENU);
+                    String clientInfo = userService.getUser(data).toShortString();
+                    sendMessageService.sendMessage(currentUserId, clientInfo);
+                    break;
+                case ADD_CLIENT_TO_GROUP_STEP_1:
+                    userContextService.setState(currentUserId, ADD_CLIENT_TO_GROUP_STEP_2);
+                    userContextService.setGroup(currentUserId, data);
+                    String groupInfo = groupService.getGroup(data).toShortString();
+                    sendMessageService.sendMessage(currentUserId, groupInfo);
+                    break;
+                case ADD_CLIENT_TO_GROUP_STEP_3:
+                    userContextService.setState(currentUserId, CLIENT_ADDED_TO_GROUP);
+                    userService.addToGroup(data, groupService.getGroup(currentUser.getContext().getUserGroup()));
+                    User addedUser = userService.getUser(data);
+                    sendMessageService.sendMessage(currentUserId, addedUser.getName() + " добавлен в группу " + currentUser.getContext());
+                    break;
+                case SEND_MESSAGE_TO_GROUP_MENU:
+                    userContextService.setState(currentUserId, MESSAGE_FOR_GROUP);
+                    userContextService.setGroup(currentUserId, data);
+                    groupInfo = groupService.getGroup(data).toShortString();
+                    sendMessageService.sendMessage(currentUserId, groupInfo);
+                    break;
+                case DELETE_GROUP_STEP_1:
+                    groupInfo = groupService.getGroup(data).toShortString();
+                    groupService.deleteGroup(data);
+                    userContextService.setState(currentUserId, GROUPS_WORK_MENU);
+                    sendMessageService.sendMessage(currentUserId, "Группа " + groupInfo + " удалена");
+                    break;
+                default:
+                    if (WRONG_COMMAND.name().equals(data)) {
+                        sendMessageService.sendMessage(currentUserId, WRONG_COMMAND.getCommand());
+                    } else {
+                        userContextService.setState(currentUserId, commandStateService.getNextState(BotCommandsEnum.valueOf(data)));
+                    }
+                    break;
+            }
         }
         sendMessageService.sendStateMessage(currentUserId);
 

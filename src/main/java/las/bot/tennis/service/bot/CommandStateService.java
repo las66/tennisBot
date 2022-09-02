@@ -50,28 +50,25 @@ public class CommandStateService {
             case CLIENTS_NOT_FOUND:
                 return (asList(
                         asList(GET_CLIENT),
-                        asList(ADD_CLIENT_TO_GROUP),
-                        asList(GO_TO_MAIN_MENU)
+                        asList(ADD_CLIENT_TO_GROUP)
                 ));
             case CLIENT_WORK_MENU:
                 return (asList(
-                        asList(GO_TO_MAIN_MENU)
+                        EMPTY_LIST
                 ));
             case GROUPS_WORK_MENU:
             case GROUP_ALREADY_EXISTS:
                 return (asList(
                         asList(NEW_GROUP, DELETE_GROUP),
-                        asList(ADD_CLIENT_TO_GROUP),
-                        asList(GO_TO_MAIN_MENU)
+                        asList(ADD_CLIENT_TO_GROUP)
                 ));
             case CLIENT_ADDED_TO_GROUP:
                 return (asList(
-                        asList(GO_TO_MAIN_MENU)
+                        EMPTY_LIST
                 ));
             case SEND_MESSAGE_MENU:
                 return (asList(
-                        asList(BotCommandsEnum.SEND_MESSAGE_TO_GROUP, BotCommandsEnum.SEND_MESSAGE_TO_CLIENT),
-                        asList(GO_TO_MAIN_MENU)
+                        asList(BotCommandsEnum.SEND_MESSAGE_TO_GROUP, BotCommandsEnum.SEND_MESSAGE_TO_CLIENT)
                 ));
             default:
                 return EMPTY_LIST;

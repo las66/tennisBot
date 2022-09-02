@@ -1,6 +1,7 @@
 package las.bot.tennis.service.helper;
 
 import las.bot.tennis.model.Group;
+import las.bot.tennis.model.InlineKeyboardMarkupWithMenuButton;
 import las.bot.tennis.model.User;
 import las.bot.tennis.service.bot.BotCommandsEnum;
 import las.bot.tennis.service.bot.CommandStateService;
@@ -15,7 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static java.util.Collections.EMPTY_LIST;
 import static java.util.Collections.singletonList;
+import static las.bot.tennis.service.bot.UserStateEnum.MAIN_MENU;
 import static las.bot.tennis.service.helper.PermissionHandler.hasPermission;
 
 @Component
@@ -29,7 +32,7 @@ public class KeyboardGenerator {
         this.commandStateService = commandStateService;
     }
 
-    public InlineKeyboardMarkup getInlineKeyboard(List<List<BotCommandsEnum>> keyboardSkeleton, Set<Group> groups) {
+    public InlineKeyboardMarkup getInlineKeyboard(List<List<BotCommandsEnum>> keyboardSkeleton, Set<Group> groups, boolean isMainMenu) {
         List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
         for (List<BotCommandsEnum> rowSkeleton : keyboardSkeleton) {
@@ -46,11 +49,11 @@ public class KeyboardGenerator {
             }
         }
 
-//        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup(keyboardRows);
-//        replyKeyboardMarkup.setOneTimeKeyboard(true);
-//        replyKeyboardMarkup.setResizeKeyboard(true);
-
-        return new InlineKeyboardMarkup(keyboard);
+        if (isMainMenu) {
+            return new InlineKeyboardMarkup(keyboard);
+        } else {
+            return new InlineKeyboardMarkupWithMenuButton(keyboard);
+        }
     }
 
     public InlineKeyboardMarkup inlineUserKeyboard(List<User> users) {
@@ -62,7 +65,7 @@ public class KeyboardGenerator {
             keyboard.add(singletonList(userButton));
         }
 
-        return new InlineKeyboardMarkup(keyboard);
+        return new InlineKeyboardMarkupWithMenuButton(keyboard);
     }
 
     public InlineKeyboardMarkup inlineGroupKeyboard(List<Group> groups) {
@@ -74,14 +77,14 @@ public class KeyboardGenerator {
             keyboard.add(singletonList(groupButton));
         }
 
-        return new InlineKeyboardMarkup(keyboard);
+        return new InlineKeyboardMarkupWithMenuButton(keyboard);
     }
 
 
     public InlineKeyboardMarkup getKeyboardByState(UserStateEnum userStateEnum, Set<Group> groups) {
         List<List<BotCommandsEnum>> keyboardSkeleton = commandStateService.getKeyboardSkeleton(userStateEnum);
         if (keyboardSkeleton.size() != 0) {
-            return getInlineKeyboard(keyboardSkeleton, groups);
+            return getInlineKeyboard(keyboardSkeleton, groups, userStateEnum == MAIN_MENU);
         }
 
         switch (userStateEnum) {
@@ -91,7 +94,7 @@ public class KeyboardGenerator {
                 return inlineGroupKeyboard(groupService.getAll());
 
             default:
-                return null;
+                return new InlineKeyboardMarkupWithMenuButton(new ArrayList<>());
         }
     }
 
