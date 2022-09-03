@@ -29,6 +29,8 @@ public class CommandStateService {
                 return RENAME_GROUP_STEP_1;
             case DELETE_GROUP:
                 return DELETE_GROUP_STEP_1;
+            case LIST_GROUP:
+                return LIST_GROUP_STEP_1;
             case ADD_CLIENT_TO_GROUP:
                 return ADD_CLIENT_TO_GROUP_STEP_1;
             case SEND_MESSAGE:
@@ -61,7 +63,8 @@ public class CommandStateService {
             case GROUPS_WORK_MENU:
             case GROUP_ALREADY_EXISTS:
                 return (asList(
-                        asList(NEW_GROUP, RENAME_GROUP, DELETE_GROUP),
+                        asList(LIST_GROUP, RENAME_GROUP),
+                        asList(NEW_GROUP, DELETE_GROUP),
                         asList(ADD_CLIENT_TO_GROUP)
                 ));
             case CLIENT_ADDED_TO_GROUP:
@@ -70,7 +73,7 @@ public class CommandStateService {
                 ));
             case SEND_MESSAGE_MENU:
                 return (asList(
-                        asList(BotCommandsEnum.SEND_MESSAGE_TO_GROUP, BotCommandsEnum.SEND_MESSAGE_TO_CLIENT)
+                        asList(SEND_MESSAGE_TO_GROUP, SEND_MESSAGE_TO_CLIENT)
                 ));
             default:
                 return new ArrayList<>();

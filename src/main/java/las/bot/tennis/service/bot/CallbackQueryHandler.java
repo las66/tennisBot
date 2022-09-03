@@ -62,10 +62,8 @@ public class CallbackQueryHandler {
                     sendMessageService.sendMessage(currentUserId, groupInfo);
                     break;
                 case ADD_CLIENT_TO_GROUP_STEP_3:
+                    userService.addToGroup(currentUserId, data, groupService.getGroup(currentUser.getContext().getUserGroup()));
                     userContextService.setState(currentUserId, CLIENT_ADDED_TO_GROUP);
-                    userService.addToGroup(data, groupService.getGroup(currentUser.getContext().getUserGroup()));
-                    User addedUser = userService.getUser(data);
-                    sendMessageService.sendMessage(currentUserId, addedUser.getName() + " добавлен в группу " + currentUser.getContext().getUserGroup());
                     break;
                 case SEND_MESSAGE_TO_GROUP_MENU:
                     userContextService.setState(currentUserId, MESSAGE_FOR_GROUP);
@@ -83,6 +81,12 @@ public class CallbackQueryHandler {
                     sendMessageService.sendMessage(currentUserId, "Выбрана группа " + groupInfo);
                     userContextService.setState(currentUserId, RENAME_GROUP_STEP_2);
                     userContextService.setUserGroup(currentUserId, group.getName());
+                    break;
+                case LIST_GROUP_STEP_1:
+                    group = groupService.getGroup(data);
+                    groupInfo = group.toLongString();
+                    sendMessageService.sendMessage(currentUserId, groupInfo);
+                    userContextService.setState(currentUserId, GROUPS_WORK_MENU);
                     break;
                 default:
                     if (WRONG_COMMAND.name().equals(data)) {

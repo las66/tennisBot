@@ -71,7 +71,11 @@ public class SendMessageService {
     }
 
     public void sendMessage(Long userId, String message) {
-        sendMessage(new SendMessage(userId.toString(), message));
+        sendMessage(userId.toString(), message);
+    }
+
+    public void sendMessage(String userId, String message) {
+        sendMessage(new SendMessage(userId, message));
     }
 
     public Integer sendMessage(SendMessage sendMessage) {

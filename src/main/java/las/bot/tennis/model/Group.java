@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,7 +20,7 @@ public class Group {
     @JoinTable(name = "user_group",
             joinColumns = @JoinColumn(name = "group_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private Set<User> users;
+    private List<User> users; // дубли убрать
 
     public Group(String name) {
         this.name = name;
@@ -28,6 +28,18 @@ public class Group {
 
     public String toShortString() {
         return name + " (" + users.size() + " клиентов)";
+    }
+
+    public String toLongString() {
+        StringBuilder str = new StringBuilder("Группа ").append(name).append(":\n");
+        if (users.isEmpty()) {
+            str.append("(пусто)");
+        } else {
+            for (int i = 1; i <= users.size(); i++) {
+                str.append(i).append(". ").append(users.get(i - 1).toOneLineString()).append("\n");
+            }
+        }
+        return str.toString();
     }
 
 }

@@ -12,6 +12,7 @@ public enum BotCommandsEnum {
     NEW_GROUP("Новая"),
     RENAME_GROUP("Переименовать"),
     DELETE_GROUP("Удалить"),
+    LIST_GROUP("Список"),
     ADD_CLIENT_TO_GROUP("Добавить клиента в группу"),
     SEND_MESSAGE("Отправить сообщение"),
     SEND_MESSAGE_TO_GROUP("Группе"),

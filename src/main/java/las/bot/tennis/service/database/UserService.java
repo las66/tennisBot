@@ -54,10 +54,15 @@ public class UserService {
         return users;
     }
 
-    public void addToGroup(String userId, Group group) {
-        User user = getUser(userId);
-        user.getGroups().add(group);
-        userRepository.save(user);
+    public void addToGroup(Long currentUserId, String targetUserId, Group group) {
+        if (group.getUsers().stream().anyMatch(user -> user.getChatId().toString().equals(targetUserId))) {
+            sendMessageService.sendMessage(currentUserId, "Клиент уже находится в группе");
+        } else {
+            User user = getUser(targetUserId);
+            user.getGroups().add(group);
+            userRepository.save(user);
+            sendMessageService.sendMessage(currentUserId, user.getName() + " добавлен(а) в группу " + group.getName());
+        }
     }
 
 }

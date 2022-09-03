@@ -56,4 +56,8 @@ public class User {
         return desc.toString();
     }
 
+    public String toOneLineString() {
+        return name + ", т: " + phone + " (" + description + ")";
+    }
+
 }
