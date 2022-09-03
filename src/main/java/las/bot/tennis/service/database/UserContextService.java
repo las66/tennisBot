@@ -26,9 +26,15 @@ public class UserContextService {
         userContextRepository.save(userContext);
     }
 
-    public void setUserGroup(Long userId, String group) {
+    public void setTargetUserGroup(Long userId, String group) {
         UserContext userContext = getContext(userId);
-        userContext.setUserGroup(group);
+        userContext.setTargetUserGroup(group);
+        userContextRepository.save(userContext);
+    }
+
+    public void setTargetUserId(Long userId, Long targetUserId) {
+        UserContext userContext = getContext(userId);
+        userContext.setTargetUserId(targetUserId);
         userContextRepository.save(userContext);
     }
 

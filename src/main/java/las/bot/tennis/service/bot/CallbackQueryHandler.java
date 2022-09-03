@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import static java.lang.Long.parseLong;
 import static las.bot.tennis.service.bot.BotCommandsEnum.GO_TO_MAIN_MENU;
 import static las.bot.tennis.service.bot.BotCommandsEnum.WRONG_COMMAND;
 import static las.bot.tennis.service.bot.UserStateEnum.*;
@@ -51,23 +52,23 @@ public class CallbackQueryHandler {
             UserStateEnum state = UserStateEnum.getById(currentUser.getContext().getState());
             switch (state) {
                 case GET_CLIENT_STEP_2:
-                    userContextService.setState(currentUserId, CLIENT_WORK_MENU);
-                    String clientInfo = userService.getUser(data).toShortString();
+                    userContextService.setState(currentUserId, CLIENTS_WORK_MENU);
+                    String clientInfo = userService.getUser(data).toLongString();
                     sendMessageService.sendMessage(currentUserId, clientInfo);
                     break;
                 case ADD_CLIENT_TO_GROUP_STEP_1:
                     userContextService.setState(currentUserId, ADD_CLIENT_TO_GROUP_STEP_2);
-                    userContextService.setUserGroup(currentUserId, data);
+                    userContextService.setTargetUserGroup(currentUserId, data);
                     String groupInfo = groupService.getGroup(data).toShortString();
                     sendMessageService.sendMessage(currentUserId, groupInfo);
                     break;
                 case ADD_CLIENT_TO_GROUP_STEP_3:
-                    userService.addToGroup(currentUserId, data, groupService.getGroup(currentUser.getContext().getUserGroup()));
+                    userService.addToGroup(currentUserId, data, groupService.getGroup(currentUser.getContext().getTargetUserGroup()));
                     userContextService.setState(currentUserId, CLIENT_ADDED_TO_GROUP);
                     break;
                 case SEND_MESSAGE_TO_GROUP_MENU:
                     userContextService.setState(currentUserId, MESSAGE_FOR_GROUP);
-                    userContextService.setUserGroup(currentUserId, data);
+                    userContextService.setTargetUserGroup(currentUserId, data);
                     groupInfo = groupService.getGroup(data).toShortString();
                     sendMessageService.sendMessage(currentUserId, groupInfo);
                     break;
@@ -80,7 +81,7 @@ public class CallbackQueryHandler {
                     groupInfo = group.toShortString();
                     sendMessageService.sendMessage(currentUserId, "Выбрана группа " + groupInfo);
                     userContextService.setState(currentUserId, RENAME_GROUP_STEP_2);
-                    userContextService.setUserGroup(currentUserId, group.getName());
+                    userContextService.setTargetUserGroup(currentUserId, group.getName());
                     break;
                 case LIST_GROUP_STEP_1:
                     group = groupService.getGroup(data);
@@ -90,13 +91,19 @@ public class CallbackQueryHandler {
                     break;
                 case DELETE_CLIENT_FROM_GROUP_STEP_1:
                     userContextService.setState(currentUserId, DELETE_CLIENT_FROM_GROUP_STEP_2);
-                    userContextService.setUserGroup(currentUserId, data);
+                    userContextService.setTargetUserGroup(currentUserId, data);
                     groupInfo = groupService.getGroup(data).toShortString();
                     sendMessageService.sendMessage(currentUserId, groupInfo);
                     break;
                 case DELETE_CLIENT_FROM_GROUP_STEP_2:
-                    userService.deleteGroup(currentUserId, data, currentUser.getContext().getUserGroup());
+                    userService.deleteGroup(currentUserId, data, currentUser.getContext().getTargetUserGroup());
                     userContextService.setState(currentUserId, MAIN_MENU);
+                    break;
+                case CHANGE_CLIENT_STEP_2:
+                    userContextService.setState(currentUserId, CHANGE_CLIENT_STEP_3);
+                    userContextService.setTargetUserId(currentUserId, parseLong(data));
+                    clientInfo = userService.getUser(data).toLongString();
+                    sendMessageService.sendMessage(currentUserId, clientInfo);
                     break;
                 default:
                     if (WRONG_COMMAND.name().equals(data)) {

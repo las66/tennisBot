@@ -23,7 +23,8 @@ public class UserContext {
     private User user;
 
     private int state;
-    private String userGroup;
+    private String targetUserGroup;
+    private Long targetUserId;
     private Integer menuMessageId;
 
     public UserContext(Long userId) {

@@ -23,6 +23,8 @@ public class CommandStateService {
                 return GROUPS_WORK_MENU;
             case GET_CLIENT:
                 return GET_CLIENT_STEP_1;
+            case CHANGE_CLIENT:
+                return CHANGE_CLIENT_STEP_1;
             case NEW_GROUP:
                 return NEW_GROUP_STEP_1;
             case RENAME_GROUP:
@@ -43,6 +45,12 @@ public class CommandStateService {
                 return SEND_MESSAGE_TO_CLIENT_MENU;
             case SEND_MESSAGE_TO_GROUP:
                 return SEND_MESSAGE_TO_GROUP_MENU;
+            case CHANGE_CLIENT_NAME:
+                return CHANGE_CLIENT_STEP_3_1;
+            case CHANGE_CLIENT_PHONE:
+                return CHANGE_CLIENT_STEP_3_2;
+            case CHANGE_CLIENT_DESCRIPTION:
+                return CHANGE_CLIENT_STEP_3_3;
         }
         return null;
     }
@@ -55,14 +63,9 @@ public class CommandStateService {
                         asList(WORK_WITH_GROUPS, WORK_WITH_CLIENTS)
                 ));
             case CLIENTS_WORK_MENU:
-            case CLIENTS_NOT_FOUND:
                 return (asList(
-                        asList(GET_CLIENT),
+                        asList(GET_CLIENT, CHANGE_CLIENT),
                         asList(ADD_CLIENT_TO_GROUP_2, DELETE_CLIENT_FROM_GROUP_2)
-                ));
-            case CLIENT_WORK_MENU:
-                return (asList(
-                        new ArrayList<>()
                 ));
             case GROUPS_WORK_MENU:
             case GROUP_ALREADY_EXISTS:
@@ -78,6 +81,10 @@ public class CommandStateService {
             case SEND_MESSAGE_MENU:
                 return (asList(
                         asList(SEND_MESSAGE_TO_GROUP, SEND_MESSAGE_TO_CLIENT)
+                ));
+            case CHANGE_CLIENT_STEP_3:
+                return (asList(
+                        asList(CHANGE_CLIENT_NAME, CHANGE_CLIENT_PHONE, CHANGE_CLIENT_DESCRIPTION)
                 ));
             default:
                 return new ArrayList<>();

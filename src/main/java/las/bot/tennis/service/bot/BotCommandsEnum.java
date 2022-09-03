@@ -8,7 +8,8 @@ public enum BotCommandsEnum {
     GO_TO_MAIN_MENU("⬅️ Главное меню"),
     WORK_WITH_CLIENTS("Клиенты"),
     WORK_WITH_GROUPS("Группы"),
-    GET_CLIENT("Найти клиента"),
+    GET_CLIENT("Инфо"),
+    CHANGE_CLIENT("Изменить"),
     NEW_GROUP("Новая"),
     RENAME_GROUP("Переименовать"),
     DELETE_GROUP("Удалить"),
@@ -20,6 +21,9 @@ public enum BotCommandsEnum {
     SEND_MESSAGE("Отправить сообщение"),
     SEND_MESSAGE_TO_GROUP("Группе"),
     SEND_MESSAGE_TO_CLIENT("Клиенту"),
+    CHANGE_CLIENT_NAME("ФИО"),
+    CHANGE_CLIENT_PHONE("Телефон"),
+    CHANGE_CLIENT_DESCRIPTION("Заметка"),
 
     WRONG_COMMAND("Неизвестная команда \uD83E\uDD37\u200D♀️");
 

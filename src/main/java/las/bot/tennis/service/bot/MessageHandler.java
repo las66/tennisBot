@@ -37,33 +37,35 @@ public class MessageHandler {
     }
 
     public void process(Message message) {
-        User currentUser = userService.getUser(message.getChatId());
+        Long currentUserId = message.getChatId();
+        User currentUser = userService.getUser(currentUserId);
         UserStateEnum state = getById(currentUser.getContext().getState());
         userContextService.setMenuMessageId(currentUser.getChatId(), null);
-        if (message.getText().startsWith(BotCommandsEnum.START.getCommand())) {
+        String data = message.getText();
+        if (data.startsWith(BotCommandsEnum.START.getCommand())) {
             sendMessageService.sendMessage(currentUser.getChatId(), "Тут будет приветственное сообщение"); //todo
             return;
         }
         switch (state) {
             case GET_CLIENT_STEP_1:
-                List<User> users = userService.findUsers(message.getText());
+                List<User> users = userService.findUsers(data);
                 InlineKeyboardMarkup keyboard = null;
                 if (users.isEmpty()) {
-                    userContextService.setState(message.getChatId(), CLIENTS_NOT_FOUND);
+                    sendMessageService.sendMessage(currentUserId, "Клиенты по данному фильтру не найдены");
                 } else {
-                    userContextService.setState(message.getChatId(), GET_CLIENT_STEP_2);
+                    userContextService.setState(currentUserId, GET_CLIENT_STEP_2);
                     keyboard = keyboardGenerator.inlineUserKeyboard(users);
                 }
-                sendMessageService.sendStateMessage(message.getChatId(), keyboard);
+                sendMessageService.sendStateMessage(currentUserId, keyboard);
                 break;
             case NEW_GROUP_STEP_1:
-                if (groupService.getGroup(message.getText()) != null) {
-                    userContextService.setState(message.getChatId(), GROUP_ALREADY_EXISTS);
+                if (groupService.getGroup(data) != null) {
+                    userContextService.setState(currentUserId, GROUP_ALREADY_EXISTS);
                 } else {
                     groupService.createGroup(message);
-                    userContextService.setState(message.getChatId(), MAIN_MENU);
+                    userContextService.setState(currentUserId, MAIN_MENU);
                 }
-                sendMessageService.sendStateMessage(message.getChatId());
+                sendMessageService.sendStateMessage(currentUserId);
                 break;
             case ADD_CLIENT_TO_GROUP_STEP_1:
             case SEND_MESSAGE_TO_GROUP_MENU:
@@ -71,40 +73,72 @@ public class MessageHandler {
             case RENAME_GROUP_STEP_1:
             case LIST_GROUP_STEP_1:
             case DELETE_CLIENT_FROM_GROUP_STEP_1:
-                List<Group> groups = groupService.getAll(message.getText());
-                sendMessageService.sendStateMessage(message.getChatId(), keyboardGenerator.inlineGroupKeyboard(groups));
+                List<Group> groups = groupService.getAll(data);
+                sendMessageService.sendStateMessage(currentUserId, keyboardGenerator.inlineGroupKeyboard(groups));
                 break;
             case ADD_CLIENT_TO_GROUP_STEP_2:
-                users = userService.findUsers(message.getText());
+                users = userService.findUsers(data);
                 keyboard = null;
                 if (users.isEmpty()) {
-                    sendMessageService.sendMessage(message.getChatId(), CLIENTS_NOT_FOUND.getMessage());
+                    sendMessageService.sendMessage(currentUserId, "Клиенты по данному фильтру не найдены");
                 } else {
-                    userContextService.setState(message.getChatId(), ADD_CLIENT_TO_GROUP_STEP_3);
+                    userContextService.setState(currentUserId, ADD_CLIENT_TO_GROUP_STEP_3);
                     keyboard = keyboardGenerator.inlineUserKeyboard(users);
                 }
-                sendMessageService.sendStateMessage(message.getChatId(), keyboard);
+                sendMessageService.sendStateMessage(currentUserId, keyboard);
                 break;
             case MESSAGE_FOR_GROUP:
-                userContextService.setState(message.getChatId(), MAIN_MENU);
-                sendMessageService.sendMessageToGroup(message.getText(), currentUser.getContext().getUserGroup());
-                String infoMessage = "Группе " + currentUser.getContext().getUserGroup() + " успешно отправлено сообщение:\n" + message.getText();
+                userContextService.setState(currentUserId, MAIN_MENU);
+                sendMessageService.sendMessageToGroup(data, currentUser.getContext().getTargetUserGroup());
+                String infoMessage = "Группе " + currentUser.getContext().getTargetUserGroup() + " успешно отправлено сообщение:\n" + data;
                 sendMessageService.sendMessage(currentUser.getChatId(), infoMessage);
-                sendMessageService.sendStateMessage(message.getChatId());
+                sendMessageService.sendStateMessage(currentUserId);
                 break;
             case RENAME_GROUP_STEP_2:
-                if (groupService.getGroup(message.getText()) != null) {
-                    sendMessageService.sendMessage(message.getChatId(), GROUP_ALREADY_EXISTS.getMessage());
+                if (groupService.getGroup(data) != null) {
+                    sendMessageService.sendMessage(currentUserId, GROUP_ALREADY_EXISTS.getMessage());
                 } else {
-                    groupService.renameGroup(currentUser.getChatId(), currentUser.getContext().getUserGroup(), message.getText());
-                    userContextService.setState(message.getChatId(), MAIN_MENU);
+                    groupService.renameGroup(currentUser.getChatId(), currentUser.getContext().getTargetUserGroup(), data);
+                    userContextService.setState(currentUserId, MAIN_MENU);
                 }
-                sendMessageService.sendStateMessage(message.getChatId());
+                sendMessageService.sendStateMessage(currentUserId);
                 break;
-
+            case CHANGE_CLIENT_STEP_1:
+            case CHANGE_CLIENT_STEP_2:
+                users = userService.findUsers(data);
+                keyboard = null;
+                if (users.isEmpty()) {
+                    sendMessageService.sendMessage(currentUserId, "Клиенты по данному фильтру не найдены");
+                } else {
+                    userContextService.setState(currentUserId, CHANGE_CLIENT_STEP_2);
+                    keyboard = keyboardGenerator.inlineUserKeyboard(users);
+                }
+                sendMessageService.sendStateMessage(currentUserId, keyboard);
+                break;
+            case CHANGE_CLIENT_STEP_3_1:
+                userContextService.setState(currentUserId, CHANGE_CLIENT_STEP_3);
+                userService.setName(currentUser.getContext().getTargetUserId(), data);
+                String clientInfo = userService.getUser(currentUser.getContext().getTargetUserId()).toLongString();
+                sendMessageService.sendMessage(currentUserId, clientInfo);
+                sendMessageService.sendStateMessage(currentUserId);
+                break;
+            case CHANGE_CLIENT_STEP_3_2:
+                userContextService.setState(currentUserId, CHANGE_CLIENT_STEP_3);
+                userService.setPhone(currentUser.getContext().getTargetUserId(), data);
+                clientInfo = userService.getUser(currentUser.getContext().getTargetUserId()).toLongString();
+                sendMessageService.sendMessage(currentUserId, clientInfo);
+                sendMessageService.sendStateMessage(currentUserId);
+                break;
+            case CHANGE_CLIENT_STEP_3_3:
+                userContextService.setState(currentUserId, CHANGE_CLIENT_STEP_3);
+                userService.setDescription(currentUser.getContext().getTargetUserId(), data);
+                clientInfo = userService.getUser(currentUser.getContext().getTargetUserId()).toLongString();
+                sendMessageService.sendMessage(currentUserId, clientInfo);
+                sendMessageService.sendStateMessage(currentUserId);
+                break;
             default:
                 sendMessageService.sendMessage(currentUser.getChatId(), WRONG_COMMAND.getCommand());
-                sendMessageService.sendStateMessage(message.getChatId());
+                sendMessageService.sendStateMessage(currentUserId);
                 break;
         }
     }

@@ -45,6 +45,10 @@ public class PermissionHandler {
             case SEND_MESSAGE:
             case SEND_MESSAGE_TO_GROUP:
             case SEND_MESSAGE_TO_CLIENT:
+            case CHANGE_CLIENT:
+            case CHANGE_CLIENT_NAME:
+            case CHANGE_CLIENT_PHONE:
+            case CHANGE_CLIENT_DESCRIPTION:
                 return singletonList(ADMIN_GROUP);
 
             case WRONG_COMMAND:

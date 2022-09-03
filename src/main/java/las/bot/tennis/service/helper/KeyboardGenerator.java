@@ -59,7 +59,7 @@ public class KeyboardGenerator {
         List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
         for (User user : users) {
-            InlineKeyboardButton userButton = new InlineKeyboardButton(user.getName() + " " + user.getPhone() + " " + user.getDescription());
+            InlineKeyboardButton userButton = new InlineKeyboardButton(user.toOneLineString());
             userButton.setCallbackData(user.getChatId().toString());
             keyboard.add(singletonList(userButton));
         }
@@ -96,7 +96,7 @@ public class KeyboardGenerator {
             case DELETE_CLIENT_FROM_GROUP_STEP_1:
                 return inlineGroupKeyboard(groupService.getAll());
             case DELETE_CLIENT_FROM_GROUP_STEP_2:
-                return inlineUserKeyboard(groupService.getGroup(user.getContext().getUserGroup()).getUsers());
+                return inlineUserKeyboard(groupService.getGroup(user.getContext().getTargetUserGroup()).getUsers());
             default:
                 return new InlineKeyboardMarkupWithMenuButton(new ArrayList<>());
         }

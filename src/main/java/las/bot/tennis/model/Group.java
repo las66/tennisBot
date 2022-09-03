@@ -27,7 +27,7 @@ public class Group {
     }
 
     public String toShortString() {
-        return name + " (" + users.size() + " клиентов)";
+        return name + " (" + users.size() + " человек)";
     }
 
     public String toLongString() {

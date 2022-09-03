@@ -50,7 +50,8 @@ public class UserService {
         userRepository.findAll().forEach(user -> {
             if ((user.getName() != null && user.getName().toLowerCase().contains(text.toLowerCase()))
                     || (user.getPhone() != null && user.getPhone().toLowerCase().contains(text.toLowerCase()))
-                    || (user.getDescription() != null && user.getDescription().toLowerCase().contains(text.toLowerCase()))) {
+                    || (user.getDescription() != null && user.getDescription().toLowerCase().contains(text.toLowerCase()))
+                    || (user.getChatId().toString().contains(text.toLowerCase()))) {
                 users.add(user);
             }
         });
@@ -76,4 +77,21 @@ public class UserService {
         sendMessageService.sendMessage(currentUserId, targetUser.getName() + " удален(а) из группы " + group.getName());
     }
 
+    public void setName(Long targetUserId, String name) {
+        User user = getUser(targetUserId);
+        user.setName(name);
+        userRepository.save(user);
+    }
+
+    public void setPhone(Long targetUserId, String phone) {
+        User user = getUser(targetUserId);
+        user.setPhone(phone);
+        userRepository.save(user);
+    }
+
+    public void setDescription(Long targetUserId, String description) {
+        User user = getUser(targetUserId);
+        user.setDescription(description);
+        userRepository.save(user);
+    }
 }

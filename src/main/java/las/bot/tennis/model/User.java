@@ -40,7 +40,7 @@ public class User {
         this.context.setUser(this);
     }
 
-    public String toShortString() {
+    public String toLongString() {
         StringBuilder desc = new StringBuilder(name).append("\n")
                 .append("\uD83D\uDCDE ").append(phone).append("\n")
                 .append(description).append("\n\n")
