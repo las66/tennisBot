@@ -88,6 +88,16 @@ public class CallbackQueryHandler {
                     sendMessageService.sendMessage(currentUserId, groupInfo);
                     userContextService.setState(currentUserId, GROUPS_WORK_MENU);
                     break;
+                case DELETE_CLIENT_FROM_GROUP_STEP_1:
+                    userContextService.setState(currentUserId, DELETE_CLIENT_FROM_GROUP_STEP_2);
+                    userContextService.setUserGroup(currentUserId, data);
+                    groupInfo = groupService.getGroup(data).toShortString();
+                    sendMessageService.sendMessage(currentUserId, groupInfo);
+                    break;
+                case DELETE_CLIENT_FROM_GROUP_STEP_2:
+                    userService.deleteGroup(currentUserId, data, currentUser.getContext().getUserGroup());
+                    userContextService.setState(currentUserId, MAIN_MENU);
+                    break;
                 default:
                     if (WRONG_COMMAND.name().equals(data)) {
                         sendMessageService.sendMessage(currentUserId, WRONG_COMMAND.getCommand());

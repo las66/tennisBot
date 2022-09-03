@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static java.util.Collections.EMPTY_LIST;
 import static java.util.Collections.singletonList;
 import static las.bot.tennis.service.bot.UserStateEnum.MAIN_MENU;
 import static las.bot.tennis.service.helper.PermissionHandler.hasPermission;
@@ -81,10 +80,11 @@ public class KeyboardGenerator {
     }
 
 
-    public InlineKeyboardMarkup getKeyboardByState(UserStateEnum userStateEnum, Set<Group> groups) {
+    public InlineKeyboardMarkup getKeyboardByState(User user) {
+        UserStateEnum userStateEnum = UserStateEnum.getById(user.getContext().getState());
         List<List<BotCommandsEnum>> keyboardSkeleton = commandStateService.getKeyboardSkeleton(userStateEnum);
         if (keyboardSkeleton.size() != 0) {
-            return getInlineKeyboard(keyboardSkeleton, groups, userStateEnum == MAIN_MENU);
+            return getInlineKeyboard(keyboardSkeleton, user.getGroups(), userStateEnum == MAIN_MENU);
         }
 
         switch (userStateEnum) {
@@ -93,8 +93,10 @@ public class KeyboardGenerator {
             case DELETE_GROUP_STEP_1:
             case RENAME_GROUP_STEP_1:
             case LIST_GROUP_STEP_1:
+            case DELETE_CLIENT_FROM_GROUP_STEP_1:
                 return inlineGroupKeyboard(groupService.getAll());
-
+            case DELETE_CLIENT_FROM_GROUP_STEP_2:
+                return inlineUserKeyboard(groupService.getGroup(user.getContext().getUserGroup()).getUsers());
             default:
                 return new InlineKeyboardMarkupWithMenuButton(new ArrayList<>());
         }

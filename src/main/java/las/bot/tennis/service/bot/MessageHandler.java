@@ -70,6 +70,7 @@ public class MessageHandler {
             case DELETE_GROUP_STEP_1:
             case RENAME_GROUP_STEP_1:
             case LIST_GROUP_STEP_1:
+            case DELETE_CLIENT_FROM_GROUP_STEP_1:
                 List<Group> groups = groupService.getAll(message.getText());
                 sendMessageService.sendStateMessage(message.getChatId(), keyboardGenerator.inlineGroupKeyboard(groups));
                 break;

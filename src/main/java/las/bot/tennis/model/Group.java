@@ -20,7 +20,7 @@ public class Group {
     @JoinTable(name = "user_group",
             joinColumns = @JoinColumn(name = "group_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private List<User> users; // дубли убрать
+    private List<User> users;
 
     public Group(String name) {
         this.name = name;
@@ -42,4 +42,22 @@ public class Group {
         return str.toString();
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof Group)) {
+            return false;
+        }
+        return this.name.equals(((Group) obj).name);
+    }
+
+    @Override
+    public int hashCode() {
+        if (name == null) {
+            return 0;
+        }
+        return name.hashCode();
+    }
 }

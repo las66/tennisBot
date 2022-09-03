@@ -47,7 +47,7 @@ public class SendMessageService {
     public void sendStateMessage(Long userId, InlineKeyboardMarkup keyboard) {
         User user = userService.getUser(userId);
         UserStateEnum userStateEnum = UserStateEnum.getById(user.getContext().getState());
-        InlineKeyboardMarkup newKeyboard = keyboard == null ? keyboardGenerator.getKeyboardByState(userStateEnum, user.getGroups()) : keyboard;
+        InlineKeyboardMarkup newKeyboard = keyboard == null ? keyboardGenerator.getKeyboardByState(user) : keyboard;
         if (user.getContext().getMenuMessageId() == null) {
             SendMessage sendMessage = new SendMessage(userId.toString(), userStateEnum.getMessage());
             sendMessage.setReplyMarkup(newKeyboard);

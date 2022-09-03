@@ -18,10 +18,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final SendMessageService sendMessageService;
+    private final GroupService groupService;
 
-    public UserService(UserRepository userRepository, @Lazy SendMessageService sendMessageService) {
+    public UserService(UserRepository userRepository, @Lazy SendMessageService sendMessageService, GroupService groupService) {
         this.userRepository = userRepository;
         this.sendMessageService = sendMessageService;
+        this.groupService = groupService;
     }
 
     public User getUser(Long userId) {
@@ -63,6 +65,14 @@ public class UserService {
             userRepository.save(user);
             sendMessageService.sendMessage(currentUserId, user.getName() + " добавлен(а) в группу " + group.getName());
         }
+    }
+
+    public void deleteGroup(Long currentUserId, String targetUserId, String userGroup) {
+        Group group = groupService.getGroup(userGroup);
+        User targetUser = getUser(targetUserId);
+        targetUser.getGroups().remove(group);
+        userRepository.save(targetUser);
+        sendMessageService.sendMessage(currentUserId, targetUser.getName() + " удален(а) из группы " + group.getName());
     }
 
 }
