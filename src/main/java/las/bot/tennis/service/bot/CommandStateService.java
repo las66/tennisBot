@@ -42,7 +42,7 @@ public class CommandStateService {
             case SEND_MESSAGE:
                 return SEND_MESSAGE_MENU;
             case SEND_MESSAGE_TO_CLIENT:
-                return SEND_MESSAGE_TO_CLIENT_MENU;
+                return SEND_MESSAGE_TO_CLIENT_STEP_1;
             case SEND_MESSAGE_TO_GROUP:
                 return SEND_MESSAGE_TO_GROUP_MENU;
             case CHANGE_CLIENT_NAME:

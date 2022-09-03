@@ -105,6 +105,12 @@ public class CallbackQueryHandler {
                     clientInfo = userService.getUser(data).toLongString();
                     sendMessageService.sendMessage(currentUserId, clientInfo);
                     break;
+                case SEND_MESSAGE_TO_CLIENT_STEP_2:
+                    userContextService.setState(currentUserId, SEND_MESSAGE_TO_CLIENT_STEP_3);
+                    userContextService.setTargetUserId(currentUserId, parseLong(data));
+                    clientInfo = userService.getUser(data).toLongString();
+                    sendMessageService.sendMessage(currentUserId, clientInfo);
+                    break;
                 default:
                     if (WRONG_COMMAND.name().equals(data)) {
                         sendMessageService.sendMessage(currentUserId, WRONG_COMMAND.getCommand());
