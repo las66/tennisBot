@@ -13,8 +13,7 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import static java.lang.Long.parseLong;
-import static las.bot.tennis.service.bot.BotCommandsEnum.GO_TO_MAIN_MENU;
-import static las.bot.tennis.service.bot.BotCommandsEnum.WRONG_COMMAND;
+import static las.bot.tennis.service.bot.BotCommandsEnum.*;
 import static las.bot.tennis.service.bot.UserStateEnum.*;
 
 @Slf4j
@@ -110,6 +109,20 @@ public class CallbackQueryHandler {
                     userContextService.setTargetUserId(currentUserId, parseLong(data));
                     clientInfo = userService.getUser(data).toLongString();
                     sendMessageService.sendMessage(currentUserId, clientInfo);
+                    break;
+                case DELETE_CLIENT_STEP_2:
+                    userContextService.setState(currentUserId, DELETE_CLIENT_STEP_3);
+                    userContextService.setTargetUserId(currentUserId, parseLong(data));
+                    clientInfo = userService.getUser(data).toLongString();
+                    sendMessageService.sendMessage(currentUserId, clientInfo);
+                    break;
+                case DELETE_CLIENT_STEP_3:
+                    if (data.equals(DELETE_CLIENT_NO.name())) {
+                        sendMessageService.sendMessage(currentUserId, "Клиент не удален");
+                    } else {
+                        userService.deleteUser(currentUserId, currentUser.getContext().getTargetUserId());
+                    }
+                    userContextService.setState(currentUserId, CLIENTS_WORK_MENU);
                     break;
                 default:
                     if (WRONG_COMMAND.name().equals(data)) {

@@ -48,10 +48,11 @@ public class UserService {
     public List<User> findUsers(String text) {
         List<User> users = new ArrayList<>();
         userRepository.findAll().forEach(user -> {
-            if ((user.getName() != null && user.getName().toLowerCase().contains(text.toLowerCase()))
+            if (((user.getName() != null && user.getName().toLowerCase().contains(text.toLowerCase()))
                     || (user.getPhone() != null && user.getPhone().toLowerCase().contains(text.toLowerCase()))
                     || (user.getDescription() != null && user.getDescription().toLowerCase().contains(text.toLowerCase()))
-                    || (user.getChatId().toString().contains(text.toLowerCase()))) {
+                    || (user.getChatId().toString().contains(text.toLowerCase())))
+                    && !user.isDeleted()) {
                 users.add(user);
             }
         });
@@ -94,4 +95,17 @@ public class UserService {
         user.setDescription(description);
         userRepository.save(user);
     }
+
+    public void deleteUser(Long currentUserId, Long targetUserId) {
+        User targetUser = getUser(targetUserId);
+        String info = targetUser.toOneLineString();
+        for (Group group : targetUser.getGroups()) {
+            sendMessageService.sendMessage(currentUserId, "Клиент удален из группы " + group.getName());
+        }
+        targetUser.setGroups(null);
+        targetUser.setDeleted(true);
+        userRepository.save(targetUser);
+        sendMessageService.sendMessage(currentUserId, "Клиент " + info + " удален");
+    }
+
 }

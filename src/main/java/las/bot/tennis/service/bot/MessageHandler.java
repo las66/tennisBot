@@ -156,6 +156,18 @@ public class MessageHandler {
                 userContextService.setState(currentUserId, MAIN_MENU);
                 sendMessageService.sendStateMessage(currentUserId);
                 break;
+            case DELETE_CLIENT_STEP_1:
+            case DELETE_CLIENT_STEP_2:
+                users = userService.findUsers(data);
+                keyboard = null;
+                if (users.isEmpty()) {
+                    sendMessageService.sendMessage(currentUserId, "Клиенты по данному фильтру не найдены");
+                } else {
+                    userContextService.setState(currentUserId, DELETE_CLIENT_STEP_2);
+                    keyboard = keyboardGenerator.inlineUserKeyboard(users);
+                }
+                sendMessageService.sendStateMessage(currentUserId, keyboard);
+                break;
             default:
                 sendMessageService.sendMessage(currentUser.getChatId(), WRONG_COMMAND.getCommand());
                 sendMessageService.sendStateMessage(currentUserId);

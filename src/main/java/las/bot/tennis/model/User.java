@@ -31,6 +31,7 @@ public class User {
     private String name;
     private String phone;
     private String description;
+    private boolean deleted;
 
     public User(Long chatId, String name, String description) {
         this.chatId = chatId;
@@ -38,6 +39,7 @@ public class User {
         this.name = name;
         this.context = new UserContext(chatId);
         this.context.setUser(this);
+        this.deleted = false;
     }
 
     public String toLongString() {

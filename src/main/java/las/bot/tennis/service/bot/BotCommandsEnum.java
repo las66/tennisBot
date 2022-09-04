@@ -24,6 +24,9 @@ public enum BotCommandsEnum {
     CHANGE_CLIENT_NAME("ФИО"),
     CHANGE_CLIENT_PHONE("Телефон"),
     CHANGE_CLIENT_DESCRIPTION("Заметка"),
+    DELETE_CLIENT("Удалить"),
+    DELETE_CLIENT_YES("Да, удалить"),
+    DELETE_CLIENT_NO("НЕТ"),
 
     WRONG_COMMAND("Неизвестная команда \uD83E\uDD37\u200D♀️");
 

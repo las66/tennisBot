@@ -49,6 +49,9 @@ public class PermissionHandler {
             case CHANGE_CLIENT_NAME:
             case CHANGE_CLIENT_PHONE:
             case CHANGE_CLIENT_DESCRIPTION:
+            case DELETE_CLIENT:
+            case DELETE_CLIENT_YES:
+            case DELETE_CLIENT_NO:
                 return singletonList(ADMIN_GROUP);
 
             case WRONG_COMMAND:

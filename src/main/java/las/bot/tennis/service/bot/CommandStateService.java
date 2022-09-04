@@ -51,6 +51,8 @@ public class CommandStateService {
                 return CHANGE_CLIENT_STEP_3_2;
             case CHANGE_CLIENT_DESCRIPTION:
                 return CHANGE_CLIENT_STEP_3_3;
+            case DELETE_CLIENT:
+                return DELETE_CLIENT_STEP_1;
         }
         return null;
     }
@@ -64,7 +66,7 @@ public class CommandStateService {
                 ));
             case CLIENTS_WORK_MENU:
                 return (asList(
-                        asList(GET_CLIENT, CHANGE_CLIENT),
+                        asList(GET_CLIENT, CHANGE_CLIENT, DELETE_CLIENT),
                         asList(ADD_CLIENT_TO_GROUP_2, DELETE_CLIENT_FROM_GROUP_2)
                 ));
             case GROUPS_WORK_MENU:
@@ -85,6 +87,10 @@ public class CommandStateService {
             case CHANGE_CLIENT_STEP_3:
                 return (asList(
                         asList(CHANGE_CLIENT_NAME, CHANGE_CLIENT_PHONE, CHANGE_CLIENT_DESCRIPTION)
+                ));
+            case DELETE_CLIENT_STEP_3:
+                return (asList(
+                        asList(DELETE_CLIENT_YES, DELETE_CLIENT_NO)
                 ));
             default:
                 return new ArrayList<>();
