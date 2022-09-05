@@ -16,6 +16,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import static java.lang.Long.parseLong;
 import static las.bot.tennis.service.bot.BotCommandsEnum.*;
 import static las.bot.tennis.service.bot.UserStateEnum.*;
+import static las.bot.tennis.service.database.GroupService.ADMIN_GROUP;
 
 @Slf4j
 @Service
@@ -48,12 +49,13 @@ public class CallbackQueryHandler {
     public void process(CallbackQuery callbackQuery) {
         Long currentUserId = callbackQuery.getMessage().getChatId();
         User currentUser = userService.getUser(currentUserId);
+        boolean currentUserIsAdmin = currentUser.getGroups().stream().map(Group::getName).anyMatch(name -> name.equals(ADMIN_GROUP));
         String data = callbackQuery.getData();
         if (data.startsWith("poll_answer_")) {
             String answerId = data.substring("poll_answer_".length());
             pollService.saveVote(currentUser, answerId);
             sendMessageService.editPollMessage(currentUser, callbackQuery.getMessage().getMessageId(), pollService.getAnswer(answerId).getAnswerText());
-        } else {
+        } else if (currentUserIsAdmin) {
             if (GO_TO_MAIN_MENU.name().equals(data)) {
                 userContextService.setState(currentUserId, commandStateService.getNextState(GO_TO_MAIN_MENU));
             } else {

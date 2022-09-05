@@ -14,6 +14,7 @@ import java.util.List;
 
 import static las.bot.tennis.service.bot.BotCommandsEnum.WRONG_COMMAND;
 import static las.bot.tennis.service.bot.UserStateEnum.*;
+import static las.bot.tennis.service.database.GroupService.ADMIN_GROUP;
 
 @Service
 public class MessageHandler {
@@ -38,14 +39,20 @@ public class MessageHandler {
 
     public void process(Message message) {
         Long currentUserId = message.getChatId();
-        User currentUser = userService.getUser(currentUserId);
-        UserStateEnum state = getById(currentUser.getContext().getState());
-        userContextService.setMenuMessageId(currentUser.getChatId(), null);
         String data = message.getText();
         if (data.startsWith(BotCommandsEnum.START.getCommand())) {
-            sendMessageService.sendMessage(currentUser.getChatId(), "Тут будет приветственное сообщение"); //todo
+            sendMessageService.sendMessage(currentUserId, "Тут будет приветственное сообщение"); //todo
             return;
         }
+
+        User currentUser = userService.getUser(currentUserId);
+        boolean currentUserIsAdmin = currentUser.getGroups().stream().map(Group::getName).anyMatch(name -> name.equals(ADMIN_GROUP));
+        if (!currentUserIsAdmin) {
+            sendMessageService.sendMessage(currentUserId, WRONG_COMMAND.getCommand());
+            return;
+        }
+        userContextService.setMenuMessageId(currentUserId, null);
+        UserStateEnum state = getById(currentUser.getContext().getState());
         switch (state) {
             case GET_CLIENT_STEP_1:
                 List<User> users = userService.findUsers(data);
@@ -92,14 +99,14 @@ public class MessageHandler {
                 userContextService.setState(currentUserId, MAIN_MENU);
                 sendMessageService.sendMessageToGroup(data, currentUser.getContext().getTargetUserGroup());
                 String infoMessage = "Группе " + currentUser.getContext().getTargetUserGroup() + " успешно отправлено сообщение:\n" + data;
-                sendMessageService.sendMessage(currentUser.getChatId(), infoMessage);
+                sendMessageService.sendMessage(currentUserId, infoMessage);
                 sendMessageService.sendStateMessage(currentUserId);
                 break;
             case RENAME_GROUP_STEP_2:
                 if (groupService.getGroup(data) != null) {
                     sendMessageService.sendMessage(currentUserId, GROUP_ALREADY_EXISTS.getMessage());
                 } else {
-                    groupService.renameGroup(currentUser.getChatId(), currentUser.getContext().getTargetUserGroup(), data);
+                    groupService.renameGroup(currentUserId, currentUser.getContext().getTargetUserGroup(), data);
                     userContextService.setState(currentUserId, MAIN_MENU);
                 }
                 sendMessageService.sendStateMessage(currentUserId);
@@ -170,7 +177,7 @@ public class MessageHandler {
                 sendMessageService.sendStateMessage(currentUserId, keyboard);
                 break;
             default:
-                sendMessageService.sendMessage(currentUser.getChatId(), WRONG_COMMAND.getCommand());
+                sendMessageService.sendMessage(currentUserId, WRONG_COMMAND.getCommand());
                 sendMessageService.sendStateMessage(currentUserId);
                 break;
         }
