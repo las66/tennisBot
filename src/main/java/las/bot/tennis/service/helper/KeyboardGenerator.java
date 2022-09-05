@@ -1,12 +1,11 @@
 package las.bot.tennis.service.helper;
 
-import las.bot.tennis.model.Group;
-import las.bot.tennis.model.InlineKeyboardMarkupWithMenuButton;
-import las.bot.tennis.model.User;
+import las.bot.tennis.model.*;
 import las.bot.tennis.service.bot.BotCommandsEnum;
 import las.bot.tennis.service.bot.CommandStateService;
 import las.bot.tennis.service.bot.UserStateEnum;
 import las.bot.tennis.service.database.GroupService;
+import las.bot.tennis.service.database.PollService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -24,10 +23,12 @@ import static las.bot.tennis.service.helper.PermissionHandler.hasPermission;
 public class KeyboardGenerator {
 
     private final GroupService groupService;
+    private final PollService pollService;
     private final CommandStateService commandStateService;
 
-    public KeyboardGenerator(@Lazy GroupService groupService, CommandStateService commandStateService) {
+    public KeyboardGenerator(@Lazy GroupService groupService, @Lazy PollService pollService, CommandStateService commandStateService) {
         this.groupService = groupService;
+        this.pollService = pollService;
         this.commandStateService = commandStateService;
     }
 
@@ -94,12 +95,38 @@ public class KeyboardGenerator {
             case RENAME_GROUP_STEP_1:
             case LIST_GROUP_STEP_1:
             case DELETE_CLIENT_FROM_GROUP_STEP_1:
+            case SEND_POLL_STEP_1:
                 return inlineGroupKeyboard(groupService.getAll());
             case DELETE_CLIENT_FROM_GROUP_STEP_2:
                 return inlineUserKeyboard(groupService.getGroup(user.getContext().getTargetUserGroup()).getUsers());
+            case GET_ACTIVE_POLL_RESULT:
+                return inlinePollsKeyboard(pollService.getAll());
             default:
                 return new InlineKeyboardMarkupWithMenuButton(new ArrayList<>());
         }
     }
 
+    private InlineKeyboardMarkup inlinePollsKeyboard(List<Poll> polls) {
+        List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+
+        for (Poll poll : polls) {
+            InlineKeyboardButton pollButton = new InlineKeyboardButton("(" + poll.getForGroup() + ") " + poll.getPollText());
+            pollButton.setCallbackData(poll.getId().toString());
+            keyboard.add(singletonList(pollButton));
+        }
+
+        return new InlineKeyboardMarkupWithMenuButton(keyboard);
+    }
+
+    public InlineKeyboardMarkup pullKeyboard(Poll poll) {
+        List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+
+        for (PollAnswer answer : poll.getAnswers()) {
+            InlineKeyboardButton answerButton = new InlineKeyboardButton(answer.getAnswerText());
+            answerButton.setCallbackData("poll_answer_" + answer.getId());
+            keyboard.add(singletonList(answerButton));
+        }
+
+        return new InlineKeyboardMarkup(keyboard);
+    }
 }

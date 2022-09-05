@@ -52,6 +52,10 @@ public class PermissionHandler {
             case DELETE_CLIENT:
             case DELETE_CLIENT_YES:
             case DELETE_CLIENT_NO:
+            case POLL_MENU:
+            case NEW_POLL:
+            case ACTIVE_POLLS:
+            case NEXT_MONTH_POLL:
                 return singletonList(ADMIN_GROUP);
 
             case WRONG_COMMAND:

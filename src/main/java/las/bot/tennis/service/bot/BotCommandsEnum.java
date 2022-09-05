@@ -27,6 +27,10 @@ public enum BotCommandsEnum {
     DELETE_CLIENT("Удалить"),
     DELETE_CLIENT_YES("Да, удалить"),
     DELETE_CLIENT_NO("НЕТ"),
+    POLL_MENU("Опросы"),
+    NEW_POLL("Новый"),
+    ACTIVE_POLLS("Активные"),
+    NEXT_MONTH_POLL("Опрос на следующий месяц"),
 
     WRONG_COMMAND("Неизвестная команда \uD83E\uDD37\u200D♀️");
 

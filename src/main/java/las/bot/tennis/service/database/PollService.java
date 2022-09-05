@@ -1,0 +1,89 @@
+package las.bot.tennis.service.database;
+
+import com.google.common.collect.Lists;
+import las.bot.tennis.model.*;
+import las.bot.tennis.repository.PollAnswerRepository;
+import las.bot.tennis.repository.PollRepository;
+import las.bot.tennis.repository.VoteRepository;
+import las.bot.tennis.service.bot.SendMessageService;
+import las.bot.tennis.service.helper.KeyboardGenerator;
+import las.bot.tennis.service.helper.Month;
+import org.springframework.stereotype.Service;
+
+import java.util.Calendar;
+import java.util.List;
+
+@Service
+public class PollService {
+
+    private final GroupService groupService;
+    private final PollRepository pollRepository;
+    private final PollAnswerRepository pollAnswerRepository;
+    private final VoteRepository voteRepository;
+    private final SendMessageService sendMessageService;
+    private final KeyboardGenerator keyboardGenerator;
+
+    public PollService(GroupService groupService,
+                       PollRepository pollRepository,
+                       PollAnswerRepository pollAnswerRepository,
+                       VoteRepository voteRepository,
+                       SendMessageService sendMessageService,
+                       KeyboardGenerator keyboardGenerator) {
+        this.groupService = groupService;
+        this.pollRepository = pollRepository;
+        this.pollAnswerRepository = pollAnswerRepository;
+        this.voteRepository = voteRepository;
+        this.sendMessageService = sendMessageService;
+        this.keyboardGenerator = keyboardGenerator;
+    }
+
+    public void createNewNextMonthPoll(String groupName) {
+        String text = "Будете ли вы продолжать занятия в " + Month.values()[(Calendar.getInstance().get(Calendar.MONTH) + 1) % 12] + "?"; // учесть декабрь
+        Poll poll = new Poll(text, groupName);
+        poll.getAnswers().add(new PollAnswer(poll, "Да"));
+        poll.getAnswers().add(new PollAnswer(poll, "Нет"));
+
+        poll = pollRepository.save(poll);
+
+        Group group = groupService.getGroup(groupName);
+        for (User user : group.getUsers()) {
+            sendMessageService.sendMessage(user.getChatId(), text, keyboardGenerator.pullKeyboard(poll));
+        }
+    }
+
+    public void saveVote(User user, String answerId) {
+        PollAnswer answer = getAnswer(answerId);
+        Vote vote = new Vote(user, answer);
+        user.getVotes().add(vote);
+        answer.getVotes().add(vote);
+        voteRepository.save(vote);
+    }
+
+    public PollAnswer getAnswer(String answerId) {
+        return pollAnswerRepository.findById(Integer.parseInt(answerId)).get();
+    }
+
+    public List<Poll> getAll() {
+        return Lists.newArrayList(pollRepository.findAll());
+    }
+
+    public String getReport(String pollId) {
+        Poll poll = pollRepository.findById(Integer.parseInt(pollId)).get();
+        Group group = groupService.getGroup(poll.getForGroup());
+        StringBuilder report = new StringBuilder("Опрос группы ").append(group.getName()).append("\n")
+                .append(poll.getPollText());
+
+        for (User user : group.getUsers()) {
+            Vote vote = user.getVotes().stream()
+                    .filter(v -> v.getAnswer().getPoll().getId().toString().equals(pollId))
+                    .findAny()
+                    .orElse(null);
+            if (vote == null) {
+                report.append("\n[   ] ").append(user.toOneLineString());
+            } else {
+                report.append("\n[").append(vote.getAnswer().getAnswerText()).append("] ").append(user.toOneLineString());
+            }
+        }
+        return report.toString();
+    }
+}

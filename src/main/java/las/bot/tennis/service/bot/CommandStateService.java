@@ -53,6 +53,14 @@ public class CommandStateService {
                 return CHANGE_CLIENT_STEP_3_3;
             case DELETE_CLIENT:
                 return DELETE_CLIENT_STEP_1;
+            case ACTIVE_POLLS:
+                return GET_ACTIVE_POLL_RESULT;
+            case POLL_MENU:
+                return POLL_WORK_MENU;
+            case NEW_POLL:
+                return NEW_POLL_MENU;
+            case NEXT_MONTH_POLL:
+                return SEND_POLL_STEP_1;
         }
         return null;
     }
@@ -61,7 +69,7 @@ public class CommandStateService {
         switch (state) {
             case MAIN_MENU:
                 return (asList(
-                        asList(SEND_MESSAGE),
+                        asList(SEND_MESSAGE, POLL_MENU),
                         asList(WORK_WITH_GROUPS, WORK_WITH_CLIENTS)
                 ));
             case CLIENTS_WORK_MENU:
@@ -91,6 +99,14 @@ public class CommandStateService {
             case DELETE_CLIENT_STEP_3:
                 return (asList(
                         asList(DELETE_CLIENT_YES, DELETE_CLIENT_NO)
+                ));
+            case POLL_WORK_MENU:
+                return (asList(
+                        asList(NEW_POLL, ACTIVE_POLLS)
+                ));
+            case NEW_POLL_MENU:
+                return (asList(
+                        asList(NEXT_MONTH_POLL)
                 ));
             default:
                 return new ArrayList<>();

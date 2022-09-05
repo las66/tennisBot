@@ -75,7 +75,7 @@ public class SendMessageService {
     }
 
     public void sendMessage(String userId, String message) {
-        sendMessage(new SendMessage(userId, message));
+        sendMessage(userId, message, null);
     }
 
     public Integer sendMessage(SendMessage sendMessage) {
@@ -94,6 +94,28 @@ public class SendMessageService {
         Group group = groupService.getGroup(groupName);
         for (User user : group.getUsers()) {
             sendMessage(user.getChatId(), message);
+        }
+    }
+
+    public void sendMessage(Long userId, String message, InlineKeyboardMarkup keyboard) {
+        sendMessage(userId.toString(), message, keyboard);
+    }
+
+    public void sendMessage(String userId, String message, InlineKeyboardMarkup keyboard) {
+        SendMessage sendMessage = new SendMessage(userId, message);
+        sendMessage.setReplyMarkup(keyboard);
+        sendMessage(sendMessage);
+    }
+
+    public void editPollMessage(User currentUser, Integer messageId, String answer) {
+        EditMessageText editMessageText = new EditMessageText("Вы выбрали ответ " + answer);
+        editMessageText.setChatId(currentUser.getChatId());
+        editMessageText.setMessageId(messageId);
+        try {
+            log.debug("Редактирование сообщения: " + editMessageText);
+            bot.execute(editMessageText);
+        } catch (TelegramApiException e) {
+            log.error("Ошибка при редактировании сообщения", e);
         }
     }
 }
