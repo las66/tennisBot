@@ -67,15 +67,23 @@ public class UserService {
             user.getGroups().add(group);
             userRepository.save(user);
             sendMessageService.sendMessage(currentUserId, user.getName() + " добавлен(а) в группу " + group.getName());
+            if (group.getName().equals(GroupService.ADMIN_GROUP)) {
+                sendMessageService.sendMessage(targetUserId, "Теперь вы админ");
+                sendMessageService.sendStateMessage(Long.parseLong(targetUserId));
+            }
         }
     }
 
-    public void deleteGroup(Long currentUserId, String targetUserId, String userGroup) {
+    public void deleteFromGroup(Long currentUserId, String targetUserId, String userGroup) {
         Group group = groupService.getGroup(userGroup);
         User targetUser = getUser(targetUserId);
         targetUser.getGroups().remove(group);
         userRepository.save(targetUser);
         sendMessageService.sendMessage(currentUserId, targetUser.getName() + " удален(а) из группы " + group.getName());
+        if (group.getName().equals(GroupService.ADMIN_GROUP)) {
+            sendMessageService.sendMessage(targetUserId, "Вы больше не админ");
+            sendMessageService.sendStateMessage(Long.parseLong(targetUserId));
+        }
     }
 
     public void setName(Long targetUserId, String name) {

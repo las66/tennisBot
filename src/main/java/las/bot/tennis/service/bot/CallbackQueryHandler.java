@@ -104,7 +104,7 @@ public class CallbackQueryHandler {
                         sendMessageService.sendMessage(currentUserId, groupInfo);
                         break;
                     case DELETE_CLIENT_FROM_GROUP_STEP_2:
-                        userService.deleteGroup(currentUserId, data, currentUser.getContext().getTargetUserGroup());
+                        userService.deleteFromGroup(currentUserId, data, currentUser.getContext().getTargetUserGroup());
                         userContextService.setState(currentUserId, MAIN_MENU);
                         break;
                     case CHANGE_CLIENT_STEP_2:
