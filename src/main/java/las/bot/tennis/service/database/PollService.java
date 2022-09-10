@@ -37,7 +37,7 @@ public class PollService {
         this.keyboardGenerator = keyboardGenerator;
     }
 
-    public void createNewNextMonthPoll(String groupName) {
+    public void createNewNextMonthPoll(Long currentUserId, String groupName) {
         String text = "Будете ли вы продолжать занятия в " + Month.values()[(Calendar.getInstance().get(Calendar.MONTH) + 1) % 12] + "?"; // учесть декабрь
         Poll poll = new Poll(text, groupName);
         poll.getAnswers().add(new PollAnswer(poll, "Да"));
@@ -49,6 +49,7 @@ public class PollService {
         for (User user : group.getUsers()) {
             sendMessageService.sendMessage(user.getChatId(), text, keyboardGenerator.pullKeyboard(poll));
         }
+        sendMessageService.sendMessage(currentUserId, "Опрос создан");
     }
 
     public void saveVote(User user, String answerId) {

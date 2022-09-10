@@ -13,11 +13,10 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import static java.util.Collections.singletonList;
 import static las.bot.tennis.service.bot.UserStateEnum.MAIN_MENU;
-import static las.bot.tennis.service.helper.PermissionHandler.hasPermission;
+import static las.bot.tennis.service.bot.query.callback.CallbackPrefixEnum.*;
 
 @Component
 public class KeyboardGenerator {
@@ -32,17 +31,15 @@ public class KeyboardGenerator {
         this.commandStateService = commandStateService;
     }
 
-    public InlineKeyboardMarkup getInlineKeyboard(List<List<BotCommandsEnum>> keyboardSkeleton, Set<Group> groups, boolean isMainMenu) {
+    public InlineKeyboardMarkup getInlineKeyboard(List<List<BotCommandsEnum>> keyboardSkeleton, boolean isMainMenu) {
         List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
         for (List<BotCommandsEnum> rowSkeleton : keyboardSkeleton) {
             List<InlineKeyboardButton> row = new ArrayList<>();
             for (BotCommandsEnum command : rowSkeleton) {
-                if (hasPermission(command, groups)) {
-                    InlineKeyboardButton button = new InlineKeyboardButton(command.getCommand());
-                    button.setCallbackData(command.name());
-                    row.add(button);
-                }
+                InlineKeyboardButton button = new InlineKeyboardButton(command.getCommand());
+                button.setCallbackData(MENU.name() + command.name());
+                row.add(button);
             }
             if (!row.isEmpty()) {
                 keyboard.add(row);
@@ -61,7 +58,7 @@ public class KeyboardGenerator {
 
         for (User user : users) {
             InlineKeyboardButton userButton = new InlineKeyboardButton(user.toOneLineString());
-            userButton.setCallbackData(user.getChatId().toString());
+            userButton.setCallbackData(USER.name() + user.getChatId().toString());
             keyboard.add(singletonList(userButton));
         }
 
@@ -73,7 +70,7 @@ public class KeyboardGenerator {
 
         for (Group group : groups) {
             InlineKeyboardButton groupButton = new InlineKeyboardButton(group.getName());
-            groupButton.setCallbackData(group.getName());
+            groupButton.setCallbackData(GRUP.name() + group.getName());
             keyboard.add(singletonList(groupButton));
         }
 
@@ -85,7 +82,7 @@ public class KeyboardGenerator {
         UserStateEnum userStateEnum = UserStateEnum.getById(user.getContext().getState());
         List<List<BotCommandsEnum>> keyboardSkeleton = commandStateService.getKeyboardSkeleton(userStateEnum);
         if (keyboardSkeleton.size() != 0) {
-            return getInlineKeyboard(keyboardSkeleton, user.getGroups(), userStateEnum == MAIN_MENU);
+            return getInlineKeyboard(keyboardSkeleton, userStateEnum == MAIN_MENU);
         }
 
         switch (userStateEnum) {
@@ -100,18 +97,18 @@ public class KeyboardGenerator {
             case DELETE_CLIENT_FROM_GROUP_STEP_2:
                 return inlineUserKeyboard(groupService.getGroup(user.getContext().getTargetUserGroup()).getUsers());
             case GET_ACTIVE_POLL_RESULT:
-                return inlinePollsKeyboard(pollService.getAll());
+                return pollListKeyboard(pollService.getAll());
             default:
                 return new InlineKeyboardMarkupWithMenuButton(new ArrayList<>());
         }
     }
 
-    private InlineKeyboardMarkup inlinePollsKeyboard(List<Poll> polls) {
+    private InlineKeyboardMarkup pollListKeyboard(List<Poll> polls) {
         List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
         for (Poll poll : polls) {
             InlineKeyboardButton pollButton = new InlineKeyboardButton("(" + poll.getForGroup() + ") " + poll.getPollText());
-            pollButton.setCallbackData(poll.getId().toString());
+            pollButton.setCallbackData(POLL.name() + poll.getId().toString());
             keyboard.add(singletonList(pollButton));
         }
 
@@ -123,7 +120,7 @@ public class KeyboardGenerator {
 
         for (PollAnswer answer : poll.getAnswers()) {
             InlineKeyboardButton answerButton = new InlineKeyboardButton(answer.getAnswerText());
-            answerButton.setCallbackData("poll_answer_" + answer.getId());
+            answerButton.setCallbackData(ANSW.name() + answer.getId());
             keyboard.add(singletonList(answerButton));
         }
 

@@ -18,6 +18,8 @@ public class CommandStateService {
             case GO_TO_MAIN_MENU:
                 return MAIN_MENU;
             case WORK_WITH_CLIENTS:
+            case DELETE_CLIENT_YES:
+            case DELETE_CLIENT_NO:
                 return CLIENTS_WORK_MENU;
             case WORK_WITH_GROUPS:
                 return GROUPS_WORK_MENU;
@@ -65,7 +67,39 @@ public class CommandStateService {
         return null;
     }
 
+    public UserStateEnum getNextState(UserStateEnum state) {
+        switch (state) {
+            case ADD_CLIENT_TO_GROUP_STEP_1:
+                return ADD_CLIENT_TO_GROUP_STEP_2;
+            case SEND_MESSAGE_TO_GROUP_MENU:
+                return MESSAGE_FOR_GROUP;
+            case RENAME_GROUP_STEP_1:
+                return RENAME_GROUP_STEP_2;
+            case DELETE_CLIENT_FROM_GROUP_STEP_1:
+                return DELETE_CLIENT_FROM_GROUP_STEP_2;
+            case LIST_GROUP_STEP_1:
+            case DELETE_GROUP_STEP_1:
+                return GROUPS_WORK_MENU;
+            case SEND_POLL_STEP_1:
+                return POLL_WORK_MENU;
+            case DELETE_CLIENT_STEP_2:
+                return DELETE_CLIENT_STEP_3;
+            case SEND_MESSAGE_TO_CLIENT_STEP_2:
+                return SEND_MESSAGE_TO_CLIENT_STEP_3;
+            case CHANGE_CLIENT_STEP_2:
+                return CHANGE_CLIENT_STEP_3;
+            case GET_CLIENT_STEP_2:
+                return CLIENTS_WORK_MENU;
+            case ADD_CLIENT_TO_GROUP_STEP_3:
+                return CLIENT_ADDED_TO_GROUP;
+            case DELETE_CLIENT_FROM_GROUP_STEP_2:
+                return MAIN_MENU;
+        }
+        return null;
+    }
+
     public List<List<BotCommandsEnum>> getKeyboardSkeleton(UserStateEnum state) {
+        List<List<BotCommandsEnum>> menu;
         switch (state) {
             case MAIN_MENU:
                 return (asList(

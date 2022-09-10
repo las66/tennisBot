@@ -1,5 +1,6 @@
 package las.bot.tennis.service.bot;
 
+import las.bot.tennis.service.bot.query.callback.CallbackQueryHandler;
 import las.bot.tennis.service.database.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
