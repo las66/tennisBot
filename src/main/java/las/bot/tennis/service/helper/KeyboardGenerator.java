@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
+import static las.bot.tennis.service.bot.BotCommandsEnum.CLOSE_POLL;
 import static las.bot.tennis.service.bot.UserStateEnum.MAIN_MENU;
 import static las.bot.tennis.service.bot.query.callback.CallbackPrefixEnum.*;
 
@@ -77,7 +78,6 @@ public class KeyboardGenerator {
         return new InlineKeyboardMarkupWithMenuButton(keyboard);
     }
 
-
     public InlineKeyboardMarkup getKeyboardByState(User user) {
         UserStateEnum userStateEnum = UserStateEnum.getById(user.getContext().getState());
         List<List<BotCommandsEnum>> keyboardSkeleton = commandStateService.getKeyboardSkeleton(userStateEnum);
@@ -97,7 +97,7 @@ public class KeyboardGenerator {
             case DELETE_CLIENT_FROM_GROUP_STEP_2:
                 return inlineUserKeyboard(groupService.getGroup(user.getContext().getTargetUserGroup()).getUsers());
             case GET_ACTIVE_POLL_RESULT:
-                return pollListKeyboard(pollService.getAll());
+                return pollListKeyboard(pollService.getAllActive());
             default:
                 return new InlineKeyboardMarkupWithMenuButton(new ArrayList<>());
         }
@@ -126,4 +126,15 @@ public class KeyboardGenerator {
 
         return new InlineKeyboardMarkup(keyboard);
     }
+
+    public InlineKeyboardMarkup closePollKeyboard(String pollId) {
+        List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+
+        InlineKeyboardButton closeButton = new InlineKeyboardButton(CLOSE_POLL.getCommand());
+        closeButton.setCallbackData(CLSP.name() + pollId);
+        keyboard.add(singletonList(closeButton));
+
+        return new InlineKeyboardMarkup(keyboard);
+    }
+
 }

@@ -31,6 +31,7 @@ public enum BotCommandsEnum {
     NEW_POLL("Новый"),
     ACTIVE_POLLS("Активные"),
     NEXT_MONTH_POLL("Опрос на следующий месяц"),
+    CLOSE_POLL("Закрыть опрос"),
 
     WRONG_COMMAND("Неизвестная команда \uD83E\uDD37\u200D♀️");
 

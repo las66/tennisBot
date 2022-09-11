@@ -6,6 +6,7 @@ import las.bot.tennis.service.bot.UserStateEnum;
 import las.bot.tennis.service.database.PollService;
 import las.bot.tennis.service.database.UserContextService;
 import las.bot.tennis.service.database.UserService;
+import las.bot.tennis.service.helper.KeyboardGenerator;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 
@@ -18,15 +19,18 @@ public class PollCallback {
     private final UserContextService userContextService;
     private final PollService pollService;
     private final UserService userService;
+    private final KeyboardGenerator keyboardGenerator;
 
     public PollCallback(SendMessageService sendMessageService,
                         UserContextService userContextService,
                         PollService pollService,
-                        UserService userService) {
+                        UserService userService,
+                        KeyboardGenerator keyboardGenerator) {
         this.sendMessageService = sendMessageService;
         this.userContextService = userContextService;
         this.pollService = pollService;
         this.userService = userService;
+        this.keyboardGenerator = keyboardGenerator;
     }
 
     public void process(CallbackQuery callbackQuery) {
@@ -36,7 +40,7 @@ public class PollCallback {
         UserStateEnum state = UserStateEnum.getById(currentUser.getContext().getState());
         switch (state) {
             case GET_ACTIVE_POLL_RESULT:
-                sendMessageService.sendMessage(currentUserId, pollService.getReport(pollId));
+                sendMessageService.sendMessage(currentUserId, pollService.getReport(pollId), keyboardGenerator.closePollKeyboard(pollId));
                 userContextService.setState(currentUserId, POLL_WORK_MENU);
                 break;
         }

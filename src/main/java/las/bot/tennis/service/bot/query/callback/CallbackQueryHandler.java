@@ -26,6 +26,7 @@ public class CallbackQueryHandler {
     private final GroupCallback groupCallback;
     private final UserCallback userCallback;
     private final SendMessageService sendMessageService;
+    private final ClosePollCallback closePollCallback;
 
     public CallbackQueryHandler(UserService userService,
                                 TennisBot bot,
@@ -34,7 +35,8 @@ public class CallbackQueryHandler {
                                 PollCallback pollCallback,
                                 GroupCallback groupCallback,
                                 UserCallback userCallback,
-                                SendMessageService sendMessageService) {
+                                SendMessageService sendMessageService,
+                                ClosePollCallback closePollCallback) {
         this.userService = userService;
         this.bot = bot;
         this.answerCallback = answerCallback;
@@ -43,6 +45,7 @@ public class CallbackQueryHandler {
         this.groupCallback = groupCallback;
         this.userCallback = userCallback;
         this.sendMessageService = sendMessageService;
+        this.closePollCallback = closePollCallback;
     }
 
     public void process(CallbackQuery callbackQuery) {
@@ -68,6 +71,9 @@ public class CallbackQueryHandler {
                     break;
                 case USER:
                     userCallback.process(callbackQuery);
+                    break;
+                case CLSP:
+                    closePollCallback.process(callbackQuery);
                     break;
             }
             sendMessageService.sendStateMessage(currentUserId);

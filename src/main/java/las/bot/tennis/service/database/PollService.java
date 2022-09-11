@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PollService {
@@ -64,12 +65,14 @@ public class PollService {
         return pollAnswerRepository.findById(Integer.parseInt(answerId)).get();
     }
 
-    public List<Poll> getAll() {
-        return Lists.newArrayList(pollRepository.findAll());
+    public List<Poll> getAllActive() {
+        return Lists.newArrayList(pollRepository.findAll()).stream()
+                .filter(Poll::isActive)
+                .collect(Collectors.toList());
     }
 
     public String getReport(String pollId) {
-        Poll poll = pollRepository.findById(Integer.parseInt(pollId)).get();
+        Poll poll = getPoll(pollId);
         Group group = groupService.getGroup(poll.getForGroup());
         StringBuilder report = new StringBuilder("Опрос группы ").append(group.getName()).append("\n")
                 .append(poll.getPollText());
@@ -87,4 +90,15 @@ public class PollService {
         }
         return report.toString();
     }
+
+    public Poll getPoll(String pollId) {
+        return pollRepository.findById(Integer.parseInt(pollId)).get();
+    }
+
+    public void closePoll(String pollId) {
+        Poll poll = getPoll(pollId);
+        poll.setActive(false);
+        pollRepository.save(poll);
+    }
+
 }

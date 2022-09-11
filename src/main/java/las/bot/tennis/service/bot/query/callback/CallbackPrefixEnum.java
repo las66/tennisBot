@@ -2,6 +2,7 @@ package las.bot.tennis.service.bot.query.callback;
 
 public enum CallbackPrefixEnum {
     ANSW("Ответ на опрос"),
+    CLSP("Закрыть опрос"),
     GRUP("Выбор группы"),
     MENU("Меню"),
     POLL("Выбор опроса"),

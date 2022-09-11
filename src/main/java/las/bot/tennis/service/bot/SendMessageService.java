@@ -62,12 +62,7 @@ public class SendMessageService {
         editMessageText.setChatId(user.getChatId());
         editMessageText.setMessageId(user.getContext().getMenuMessageId());
         editMessageText.setReplyMarkup(newKeyboard);
-        try {
-            log.debug("Редактирование сообщения: " + editMessageText);
-            bot.execute(editMessageText);
-        } catch (TelegramApiException e) {
-            log.error("Ошибка при редактировании сообщения", e);
-        }
+        editMessage(editMessageText);
     }
 
     public void sendMessage(Long userId, String message) {
@@ -111,6 +106,10 @@ public class SendMessageService {
         EditMessageText editMessageText = new EditMessageText("Вы выбрали ответ " + answer);
         editMessageText.setChatId(currentUser.getChatId());
         editMessageText.setMessageId(messageId);
+        editMessage(editMessageText);
+    }
+
+    public void editMessage(EditMessageText editMessageText) {
         try {
             log.debug("Редактирование сообщения: " + editMessageText);
             bot.execute(editMessageText);
@@ -118,4 +117,12 @@ public class SendMessageService {
             log.error("Ошибка при редактировании сообщения", e);
         }
     }
+
+    public void editMessage(Long currentUserId, Integer messageId, String newMessage) {
+        EditMessageText editMessageText = new EditMessageText(newMessage);
+        editMessageText.setChatId(currentUserId);
+        editMessageText.setMessageId(messageId);
+        editMessage(editMessageText);
+    }
+
 }
