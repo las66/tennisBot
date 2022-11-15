@@ -18,20 +18,14 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final SendMessageService sendMessageService;
-    private final GroupService groupService;
 
-    public UserService(UserRepository userRepository, @Lazy SendMessageService sendMessageService, GroupService groupService) {
+    public UserService(UserRepository userRepository, @Lazy SendMessageService sendMessageService) {
         this.userRepository = userRepository;
         this.sendMessageService = sendMessageService;
-        this.groupService = groupService;
     }
 
     public User getUser(Long userId) {
         return userRepository.findById(userId).orElse(null);
-    }
-
-    public User getUser(String userId) {
-        return getUser(Long.parseLong(userId));
     }
 
     public void createUserIfAbsent(Message message) {
@@ -39,7 +33,7 @@ public class UserService {
             String lastName = message.getFrom().getLastName();
             String name = (lastName == null ? "" : lastName + " ") + message.getFrom().getFirstName();
             String userName = message.getFrom().getUserName();
-            User user = new User(message.getChatId(), name, userName == null ? message.getChatId().toString() : "@"+userName);
+            User user = new User(message.getChatId(), name, userName == null ? message.getChatId().toString() : "@" + userName);
             userRepository.save(user);
             sendMessageService.sendMessage(message.getChatId(), "Вы зарегистрированы!");
         }
@@ -59,30 +53,27 @@ public class UserService {
         return users;
     }
 
-    public void addToGroup(Long currentUserId, String targetUserId, Group group) {
-        if (group.getUsers().stream().anyMatch(user -> user.getChatId().toString().equals(targetUserId))) {
-            sendMessageService.sendMessage(currentUserId, "Клиент уже находится в группе");
+    public void addToGroup(Long currentUserId, Long targetUserId, Group group) {
+        if (group.getUsers().stream().anyMatch(user -> user.getChatId().equals(targetUserId))) {
+            sendMessageService.sendMessage(currentUserId, "Клиент уже находится в группе " + group.getName());
         } else {
             User user = getUser(targetUserId);
             user.getGroups().add(group);
             userRepository.save(user);
-            sendMessageService.sendMessage(currentUserId, user.getName() + " добавлен(а) в группу " + group.getName());
             if (group.getName().equals(GroupService.ADMIN_GROUP)) {
                 sendMessageService.sendMessage(targetUserId, "Теперь вы админ");
-                sendMessageService.sendStateMessage(Long.parseLong(targetUserId));
+                sendMessageService.sendStateMessage(targetUserId);
             }
         }
     }
 
-    public void deleteFromGroup(Long currentUserId, String targetUserId, String userGroup) {
-        Group group = groupService.getGroup(userGroup);
+    public void deleteFromGroup(Long targetUserId, Group group) {
         User targetUser = getUser(targetUserId);
         targetUser.getGroups().remove(group);
         userRepository.save(targetUser);
-        sendMessageService.sendMessage(currentUserId, targetUser.getName() + " удален(а) из группы " + group.getName());
         if (group.getName().equals(GroupService.ADMIN_GROUP)) {
             sendMessageService.sendMessage(targetUserId, "Вы больше не админ");
-            sendMessageService.sendStateMessage(Long.parseLong(targetUserId));
+            sendMessageService.sendStateMessage(targetUserId);
         }
     }
 
@@ -107,6 +98,14 @@ public class UserService {
     public void deleteUser(Long currentUserId, Long targetUserId) {
         User targetUser = getUser(targetUserId);
         String info = targetUser.toOneLineString();
+        List<User> usersWithDeletedUserInTarget = new ArrayList<>();
+        userRepository.findAll().forEach(user -> {
+            if (targetUserId.equals(user.getContext().getTargetUserId())) {
+                user.getContext().setTargetUserId(null);
+                usersWithDeletedUserInTarget.add(user);
+            }
+        });
+        userRepository.saveAll(usersWithDeletedUserInTarget);
         for (Group group : targetUser.getGroups()) {
             sendMessageService.sendMessage(currentUserId, "Клиент удален из группы " + group.getName());
         }
@@ -116,4 +115,19 @@ public class UserService {
         sendMessageService.sendMessage(currentUserId, "Клиент " + info + " удален");
     }
 
+    public List<User> getNewClients() {
+        List<User> users = new ArrayList<>();
+        userRepository.findAll().forEach(user -> {
+            if (user.isNewClient()) {
+                users.add(user);
+            }
+        });
+        return users;
+    }
+
+    public void confirmClient(Long targetUserId) {
+        User user = getUser(targetUserId);
+        user.setNewClient(false);
+        userRepository.save(user);
+    }
 }

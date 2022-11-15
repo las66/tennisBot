@@ -46,10 +46,9 @@ public class SendMessageService {
 
     public void sendStateMessage(Long userId, InlineKeyboardMarkup keyboard) {
         User user = userService.getUser(userId);
-        UserStateEnum userStateEnum = UserStateEnum.getById(user.getContext().getState());
         InlineKeyboardMarkup newKeyboard = keyboard == null ? keyboardGenerator.getKeyboardByState(user) : keyboard;
         if (user.getContext().getMenuMessageId() == null) {
-            SendMessage sendMessage = new SendMessage(userId.toString(), userStateEnum.getMessage());
+            SendMessage sendMessage = new SendMessage(userId.toString(), getStateMessage(user));
             sendMessage.setReplyMarkup(newKeyboard);
             userContextService.setMenuMessageId(userId, sendMessage(sendMessage));
         } else {
@@ -58,11 +57,26 @@ public class SendMessageService {
     }
 
     public void editMenuMessage(User user, InlineKeyboardMarkup newKeyboard) {
-        EditMessageText editMessageText = new EditMessageText(UserStateEnum.getById(user.getContext().getState()).getMessage());
+        EditMessageText editMessageText = new EditMessageText(getStateMessage(user));
         editMessageText.setChatId(user.getChatId());
         editMessageText.setMessageId(user.getContext().getMenuMessageId());
         editMessageText.setReplyMarkup(newKeyboard);
         editMessage(editMessageText);
+    }
+
+    private String getStateMessage(User user) {
+        UserStateEnum command = UserStateEnum.getById(user.getContext().getState());
+        Long targetUserId = user.getContext().getTargetUserId();
+        String message;
+        switch (command) {
+            case CLIENT_WORK_MENU:
+                message = userService.getUser(targetUserId).toLongString();
+                break;
+            default:
+                message = command.getMessage();
+                break;
+        }
+        return message;
     }
 
     public void sendMessage(Long userId, String message) {

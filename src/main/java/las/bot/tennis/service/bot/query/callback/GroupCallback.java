@@ -42,24 +42,28 @@ public class GroupCallback {
         Long currentUserId = callbackQuery.getMessage().getChatId();
         User currentUser = userService.getUser(currentUserId);
         UserStateEnum state = UserStateEnum.getById(currentUser.getContext().getState());
+        Long targetUserId = currentUser.getContext().getTargetUserId();
 
         switch (state) {
             case ADD_CLIENT_TO_GROUP_STEP_1:
+                userContextService.setTargetUserGroup(currentUserId, groupName);
+                userService.addToGroup(currentUserId, targetUserId, group);
+                break;
             case SEND_MESSAGE_TO_GROUP_MENU:
             case RENAME_GROUP_STEP_1:
-            case DELETE_CLIENT_FROM_GROUP_STEP_1:
                 userContextService.setTargetUserGroup(currentUserId, groupName);
                 sendMessageService.sendMessage(currentUserId, group.toShortString());
                 break;
-
+            case DELETE_CLIENT_FROM_GROUP_STEP_1:
+                userContextService.setTargetUserGroup(currentUserId, groupName);
+                userService.deleteFromGroup(targetUserId, group);
+                break;
             case LIST_GROUP_STEP_1:
                 sendMessageService.sendMessage(currentUserId, group.toLongString());
                 break;
-
             case DELETE_GROUP_STEP_1:
                 groupService.deleteGroup(currentUserId, groupName);
                 break;
-
             case SEND_POLL_STEP_1:
                 pollService.createNewNextMonthPoll(currentUserId, groupName);
                 break;

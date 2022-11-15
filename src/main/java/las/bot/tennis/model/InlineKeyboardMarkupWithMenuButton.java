@@ -18,8 +18,9 @@ public class InlineKeyboardMarkupWithMenuButton extends InlineKeyboardMarkup {
         InlineKeyboardButton button = new InlineKeyboardButton(GO_TO_MAIN_MENU.getCommand());
         button.setCallbackData(MENU.name() + GO_TO_MAIN_MENU.name());
         menuRow.add(button);
-        keyboard.add(menuRow);
-        this.setKeyboard(keyboard);
+        List<List<InlineKeyboardButton>> newKeyboard = new ArrayList<>(keyboard);
+        newKeyboard.add(menuRow);
+        this.setKeyboard(newKeyboard);
     }
 
 }

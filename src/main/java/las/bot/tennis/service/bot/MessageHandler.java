@@ -55,13 +55,14 @@ public class MessageHandler {
         UserStateEnum state = getById(currentUser.getContext().getState());
         switch (state) {
             case GET_CLIENT_STEP_1:
+            case GET_CLIENT_STEP_2:
                 List<User> users = userService.findUsers(data);
                 InlineKeyboardMarkup keyboard = null;
                 if (users.isEmpty()) {
                     sendMessageService.sendMessage(currentUserId, "Клиенты по данному фильтру не найдены");
                 } else {
                     userContextService.setState(currentUserId, GET_CLIENT_STEP_2);
-                    keyboard = keyboardGenerator.inlineUserKeyboard(users);
+                    keyboard = keyboardGenerator.inlineUsersKeyboard(users);
                 }
                 sendMessageService.sendStateMessage(currentUserId, keyboard);
                 break;
@@ -91,7 +92,7 @@ public class MessageHandler {
                     sendMessageService.sendMessage(currentUserId, "Клиенты по данному фильтру не найдены");
                 } else {
                     userContextService.setState(currentUserId, ADD_CLIENT_TO_GROUP_STEP_3);
-                    keyboard = keyboardGenerator.inlineUserKeyboard(users);
+                    keyboard = keyboardGenerator.inlineUsersKeyboard(users);
                 }
                 sendMessageService.sendStateMessage(currentUserId, keyboard);
                 break;
@@ -111,37 +112,19 @@ public class MessageHandler {
                 }
                 sendMessageService.sendStateMessage(currentUserId);
                 break;
-            case CHANGE_CLIENT_STEP_1:
-            case CHANGE_CLIENT_STEP_2:
-                users = userService.findUsers(data);
-                keyboard = null;
-                if (users.isEmpty()) {
-                    sendMessageService.sendMessage(currentUserId, "Клиенты по данному фильтру не найдены");
-                } else {
-                    userContextService.setState(currentUserId, CHANGE_CLIENT_STEP_2);
-                    keyboard = keyboardGenerator.inlineUserKeyboard(users);
-                }
-                sendMessageService.sendStateMessage(currentUserId, keyboard);
-                break;
-            case CHANGE_CLIENT_STEP_3_1:
-                userContextService.setState(currentUserId, CHANGE_CLIENT_STEP_3);
+            case CHANGE_CLIENT_NAME:
                 userService.setName(currentUser.getContext().getTargetUserId(), data);
-                String clientInfo = userService.getUser(currentUser.getContext().getTargetUserId()).toLongString();
-                sendMessageService.sendMessage(currentUserId, clientInfo);
+                userContextService.setState(currentUserId, CLIENT_WORK_MENU);
                 sendMessageService.sendStateMessage(currentUserId);
                 break;
-            case CHANGE_CLIENT_STEP_3_2:
-                userContextService.setState(currentUserId, CHANGE_CLIENT_STEP_3);
+            case CHANGE_CLIENT_PHONE:
                 userService.setPhone(currentUser.getContext().getTargetUserId(), data);
-                clientInfo = userService.getUser(currentUser.getContext().getTargetUserId()).toLongString();
-                sendMessageService.sendMessage(currentUserId, clientInfo);
+                userContextService.setState(currentUserId, CLIENT_WORK_MENU);
                 sendMessageService.sendStateMessage(currentUserId);
                 break;
-            case CHANGE_CLIENT_STEP_3_3:
-                userContextService.setState(currentUserId, CHANGE_CLIENT_STEP_3);
+            case CHANGE_CLIENT_DESC:
                 userService.setDescription(currentUser.getContext().getTargetUserId(), data);
-                clientInfo = userService.getUser(currentUser.getContext().getTargetUserId()).toLongString();
-                sendMessageService.sendMessage(currentUserId, clientInfo);
+                userContextService.setState(currentUserId, CLIENT_WORK_MENU);
                 sendMessageService.sendStateMessage(currentUserId);
                 break;
             case SEND_MESSAGE_TO_CLIENT_STEP_1:
@@ -152,7 +135,7 @@ public class MessageHandler {
                     sendMessageService.sendMessage(currentUserId, "Клиенты по данному фильтру не найдены");
                 } else {
                     userContextService.setState(currentUserId, SEND_MESSAGE_TO_CLIENT_STEP_2);
-                    keyboard = keyboardGenerator.inlineUserKeyboard(users);
+                    keyboard = keyboardGenerator.inlineUsersKeyboard(users);
                 }
                 sendMessageService.sendStateMessage(currentUserId, keyboard);
                 break;
@@ -163,18 +146,6 @@ public class MessageHandler {
                 sendMessageService.sendMessage(currentUserId, "Сообщение отправлено пользователю " + userInfo);
                 userContextService.setState(currentUserId, MAIN_MENU);
                 sendMessageService.sendStateMessage(currentUserId);
-                break;
-            case DELETE_CLIENT_STEP_1:
-            case DELETE_CLIENT_STEP_2:
-                users = userService.findUsers(data);
-                keyboard = null;
-                if (users.isEmpty()) {
-                    sendMessageService.sendMessage(currentUserId, "Клиенты по данному фильтру не найдены");
-                } else {
-                    userContextService.setState(currentUserId, DELETE_CLIENT_STEP_2);
-                    keyboard = keyboardGenerator.inlineUserKeyboard(users);
-                }
-                sendMessageService.sendStateMessage(currentUserId, keyboard);
                 break;
             default:
                 sendMessageService.sendMessage(currentUserId, WRONG_COMMAND.getCommand());
