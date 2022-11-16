@@ -21,12 +21,14 @@ public class Poll {
     @OneToMany(mappedBy = "poll", cascade = CascadeType.ALL)
     private List<PollAnswer> answers;
 
-    private String pollText;
+    private String header;
+    private String question;
     private String forGroup;
     private boolean active;
 
-    public Poll(String text, String groupName) {
-        this.pollText = text;
+    public Poll(String header, String question, String groupName) {
+        this.header = header;
+        this.question = question;
         this.forGroup = groupName;
         this.active = true;
     }

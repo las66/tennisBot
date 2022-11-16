@@ -153,7 +153,7 @@ public class KeyboardGenerator {
         List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
         for (Poll poll : polls) {
-            InlineKeyboardButton pollButton = new InlineKeyboardButton("(" + poll.getForGroup() + ") " + poll.getPollText());
+            InlineKeyboardButton pollButton = new InlineKeyboardButton("(" + poll.getForGroup() + ") " + poll.getHeader());
             pollButton.setCallbackData(POLL.name() + poll.getId().toString());
             keyboard.add(singletonList(pollButton));
         }

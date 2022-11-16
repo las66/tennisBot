@@ -39,8 +39,9 @@ public class PollService {
     }
 
     public void createNewNextMonthPoll(Long currentUserId, String groupName) {
-        String text = "Будете ли вы продолжать занятия в " + Month.values()[(Calendar.getInstance().get(Calendar.MONTH) + 1) % 12] + "?"; // учесть декабрь
-        Poll poll = new Poll(text, groupName);
+        Month month = Month.values()[(Calendar.getInstance().get(Calendar.MONTH) + 1) % 12];
+        String text = "Будете ли вы продолжать занятия в " + month.getAccusative() + "?";
+        Poll poll = new Poll(month.name(), text, groupName);
         poll.getAnswers().add(new PollAnswer(poll, "Да"));
         poll.getAnswers().add(new PollAnswer(poll, "Нет"));
 
@@ -75,7 +76,7 @@ public class PollService {
         Poll poll = getPoll(pollId);
         Group group = groupService.getGroup(poll.getForGroup());
         StringBuilder report = new StringBuilder("Опрос группы ").append(group.getName()).append("\n")
-                .append(poll.getPollText());
+                .append(poll.getQuestion());
 
         for (User user : group.getUsers()) {
             Vote vote = user.getVotes().stream()
